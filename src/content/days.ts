@@ -18,7 +18,7 @@ export const daysContent = [
       "Demonstração prática de um ambiente adequado para o sono no alojamento esportivo.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "🌙 Guardião do Sono – Dia 1",
@@ -44,7 +44,7 @@ export const daysContent = [
       "Explicação sobre luz azul e impacto na produção de melatonina.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_2",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "📵 Desafio Sem Tela – Concluído",
@@ -69,7 +69,7 @@ export const daysContent = [
       "Explicação simples sobre ritmo biológico e desempenho esportivo.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_3",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "⏰ Ritmo Campeão – Dia 3",
@@ -94,7 +94,7 @@ export const daysContent = [
       "Exemplo de hábitos que aumentam a eficiência do sono.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_4",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "🛏 Sono Eficiente – Desbloqueada",
@@ -120,7 +120,7 @@ export const daysContent = [
       "Explicação sobre substâncias estimulantes e qualidade do sono.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_5",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "⚡ Energia Inteligente – Dia 5",
@@ -145,7 +145,7 @@ export const daysContent = [
       "Relação entre álcool, fadiga e desempenho esportivo.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_6",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "🏅 Recuperação Máxima – Dia 6",
@@ -172,7 +172,7 @@ export const daysContent = [
       "Resumo motivacional mostrando relação entre sono, recuperação e performance esportiva.",
 
     videoUrl:
-      "https://www.youtube.com/watch?v=VIDEO_ID_7",
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
     medal:
       "🥇 Missão Sono Completa",

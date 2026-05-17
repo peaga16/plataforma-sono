@@ -18,7 +18,7 @@ export const authOptions = {
         // ── Admin fixo ──────────────────────────────────────────────
         if (
          credentials.email === process.env.ADMIN_EMAIL &&
-  credentials.password === process.env.ADMIN_PASSWORD
+  credentials.password === process.env.ADMIN_PASSWORD   
         ) {
           return {
             id: "admin",
