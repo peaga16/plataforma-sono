@@ -22,5 +22,6 @@ export default withAuth(
 );
 
 export const config = {
+  // /dia/:path* is intentionally NOT listed here — it stays public
   matcher: ["/atleta/:path*", "/dashboard/:path*"],
 };

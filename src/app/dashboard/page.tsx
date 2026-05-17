@@ -99,6 +99,7 @@ export default function DashboardPage() {
         <div style={{ display: "flex", background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: 4, gap: 2 }}>
           <button onClick={() => setTab("athletes")} style={navStyle(tab === "athletes")}>Atletas</button>
           <button onClick={() => setTab("register")} style={navStyle(tab === "register")}>Cadastrar</button>
+          <a href="/dashboard/qrcodes" style={{ ...navStyle(false), textDecoration: "none", display: "inline-block" }}>QR Codes</a>
         </div>
         <Link href="/api/auth/signout" style={{ color: "rgba(248,249,252,0.5)", fontSize: 12, fontFamily: "'DM Sans',sans-serif", textDecoration: "none" }}>Sair</Link>
       </header>
