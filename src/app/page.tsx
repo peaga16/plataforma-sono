@@ -106,7 +106,10 @@ export default function Home() {
         fontFamily: "'DM Sans', sans-serif",
         display: "flex", justifyContent: "space-between",
       }}>
-        <span>Desenvolvido por <a href="https://www.linkedin.com/in/pedro-andrade-38913b2a7/" target="_blank" rel="noopener noreferrer">Pedro Andrade</a></span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <span>Desenvolvido por <a href="https://www.linkedin.com/in/pedro-andrade-38913b2a7/" target="_blank" rel="noopener noreferrer" style={{ color: "#4A90D9", textDecoration: "underline", cursor: "pointer" }}>Pedro Andrade</a></span>
+          <span style={{ fontSize: 10, color: "rgba(248,249,252,0.2)" }}>→ Clique para visitar o LinkedIn</span>
+        </div>
         <span>Pesquisa em Ciências do Esporte</span>
       </footer>
     </main>
