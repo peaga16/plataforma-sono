@@ -106,7 +106,7 @@ export default function Home() {
         fontFamily: "'DM Sans', sans-serif",
         display: "flex", justifyContent: "space-between",
       }}>
-        <span>© 2025 Plataforma do Sono</span>
+        <span>Desenvolvido por <a href="https://www.linkedin.com/in/pedro-andrade-38913b2a7/" target="_blank" rel="noopener noreferrer">Pedro Andrade</a></span>
         <span>Pesquisa em Ciências do Esporte</span>
       </footer>
     </main>
