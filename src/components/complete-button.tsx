@@ -14,21 +14,13 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
   const [loading, setLoading] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
-
   const canComplete = videoWatched && scrolledToEnd;
 
-  // Libera o scroll quando o botão entra na tela
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setScrolledToEnd(true);
-          observer.disconnect();
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting) { setScrolledToEnd(true); observer.disconnect(); } },
       { threshold: 0.8 }
     );
-
     if (buttonRef.current) observer.observe(buttonRef.current);
     return () => observer.disconnect();
   }, []);
@@ -36,72 +28,63 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
   async function handleComplete() {
     if (!canComplete) return;
     setLoading(true);
-
     const response = await fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, day }),
     });
-
     setLoading(false);
-
-    if (response.ok) {
-      alert("Dia concluído com sucesso! 🎉");
-      router.push("/atleta");
-    } else {
-      alert("Erro ao registrar progresso. Tente novamente.");
-    }
+    if (response.ok) { alert("Dia concluído com sucesso! 🎉"); router.push("/atleta"); }
+    else alert("Erro ao registrar progresso. Tente novamente.");
   }
 
   return (
-    <div ref={buttonRef}>
+    <div ref={buttonRef} style={{ borderTop: "1px solid var(--border)", paddingTop: 32, marginTop: 8 }}>
 
-      {/* Indicadores de requisitos */}
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${
-          videoWatched
-            ? "bg-green-100 text-green-700"
-            : "bg-zinc-100 text-zinc-500"
-        }`}>
-          {videoWatched ? "✅" : "⏳"} Vídeo assistido
-        </div>
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${
-          scrolledToEnd
-            ? "bg-green-100 text-green-700"
-            : "bg-zinc-100 text-zinc-500"
-        }`}>
-          {scrolledToEnd ? "✅" : "⏳"} Conteúdo lido
-        </div>
+      {/* Status pills */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {[
+          { done: videoWatched, label: "Vídeo assistido" },
+          { done: scrolledToEnd, label: "Conteúdo lido" },
+        ].map((req) => (
+          <div key={req.label} style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "8px 16px", borderRadius: 100, fontSize: 13,
+            fontFamily: "'DM Sans',sans-serif", fontWeight: 500,
+            background: req.done ? "#EFF6FF" : "var(--off-white)",
+            color: req.done ? "#2B6CB0" : "var(--muted)",
+            border: `1px solid ${req.done ? "#BFDBFE" : "var(--border)"}`,
+            transition: "all 0.2s",
+          }}>
+            <span style={{ fontSize: 12 }}>{req.done ? "✓" : "○"}</span>
+            {req.label}
+          </div>
+        ))}
       </div>
 
-      {/* Mensagem orientativa */}
       {!canComplete && (
-        <p className="text-zinc-400 text-sm mb-4">
+        <p style={{ color: "var(--muted)", fontSize: 13, fontFamily: "'DM Sans',sans-serif", marginBottom: 16, lineHeight: 1.6 }}>
           {!videoWatched && !scrolledToEnd
-            ? "Assista ao vídeo completo e role até o fim da página para liberar."
-            : !videoWatched
-            ? "Assista ao vídeo completo para liberar."
-            : "Continue rolando a página para liberar."}
+            ? "Assista ao vídeo completo e role até o fim da página para liberar a conclusão."
+            : !videoWatched ? "Assista ao vídeo completo para liberar."
+            : "Role até o fim da página para liberar."}
         </p>
       )}
 
-      {/* Botão */}
       <button
         onClick={handleComplete}
         disabled={!canComplete || loading}
-        className={`w-full py-5 rounded-2xl text-lg font-semibold transition ${
-          canComplete
-            ? "bg-black text-white hover:bg-zinc-800 cursor-pointer"
-            : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-        }`}
+        style={{
+          width: "100%", border: "none", borderRadius: 8, padding: "16px",
+          fontSize: 15, fontWeight: 500, fontFamily: "'DM Sans',sans-serif",
+          cursor: canComplete && !loading ? "pointer" : "not-allowed",
+          background: canComplete ? "linear-gradient(135deg, #1A2E45, #2B6CB0)" : "var(--off-white)",
+          color: canComplete ? "#fff" : "var(--muted)",
+          transition: "all 0.2s", letterSpacing: "0.01em",
+          boxShadow: canComplete ? "0 4px 16px rgba(43,108,176,0.3)" : "none",
+        }}
       >
-        {loading
-          ? "Registrando..."
-          : canComplete
-          ? "Concluí o conteúdo de hoje ✅"
-          : "🔒 Complete os requisitos acima"}
+        {loading ? "Registrando..." : canComplete ? "Concluir conteúdo do dia →" : "🔒 Complete os requisitos acima"}
       </button>
-
     </div>
   );
 }

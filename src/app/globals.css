@@ -1,26 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
 @import "tailwindcss";
-
+ 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy:        #0D1B2A;
+  --navy-mid:    #1A2E45;
+  --navy-light:  #243B55;
+  --accent:      #2B6CB0;
+  --accent-light:#4A90D9;
+  --gold:        #C9A84C;
+  --gold-light:  #E8C97A;
+  --white:       #F8F9FC;
+  --off-white:   #EEF1F6;
+  --muted:       #7A8BA0;
+  --border:      #D4DCE8;
+  --success:     #1A7F4B;
+  --danger:      #C0392B;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+ 
+* { box-sizing: border-box; }
+ 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--white);
+  color: var(--navy);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
 }
+ 
+h1, h2, h3 {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+}
+ 
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--off-white); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

@@ -3,21 +3,15 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/session-provider";
 
 export const metadata: Metadata = {
-  title: "Plataforma do Sono",
-  description: "Educação em higiene do sono para atletas",
+  title: "Plataforma do Sono — Desempenho Esportivo",
+  description: "Programa de higiene do sono para atletas de alto rendimento",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
