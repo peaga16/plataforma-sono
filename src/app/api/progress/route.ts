@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentCycle } from "@/lib/progress";
 
 export async function POST(req: Request) {
   try {
@@ -13,27 +14,21 @@ export async function POST(req: Request) {
       );
     }
 
-    // Upsert: cria ou atualiza o progresso do dia
+    const currentCycle = await getCurrentCycle(userId);
+
     const progress = await prisma.progress.upsert({
-      where: {
-        userId_day: { userId, day },
-      },
-      update: {
-        completed: true,
-      },
-      create: {
-        userId,
-        day,
-        completed: true,
-      },
+      where: { userId_day_cycle: { userId, day, cycle: currentCycle } },
+      update: { completed: true },
+      create: { userId, day, cycle: currentCycle, completed: true },
     });
 
-    return NextResponse.json(progress);
+    // Se completou o dia 7, o próximo getCurrentCycle vai retornar currentCycle + 1
+    // pois não haverá registros completed no novo ciclo ainda
+    const cycleReset = day === 7;
+
+    return NextResponse.json({ ...progress, cycleReset, currentCycle });
   } catch (error) {
     console.error("Erro ao salvar progresso:", error);
-    return NextResponse.json(
-      { error: "Erro interno" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

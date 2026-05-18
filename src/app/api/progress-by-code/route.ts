@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentCycle } from "@/lib/progress";
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +14,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find athlete by code
     const user = await prisma.user.findUnique({
       where: { code: code.trim().toUpperCase() },
     });
@@ -25,10 +25,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if previous day is completed (day unlock logic)
+    const currentCycle = await getCurrentCycle(user.id);
+
+    // Verifica se o dia anterior foi concluído no ciclo atual
     if (day > 1) {
       const prevProgress = await prisma.progress.findUnique({
-        where: { userId_day: { userId: user.id, day: day - 1 } },
+        where: { userId_day_cycle: { userId: user.id, day: day - 1, cycle: currentCycle } },
       });
       if (!prevProgress?.completed) {
         return NextResponse.json(
@@ -38,14 +40,20 @@ export async function POST(req: Request) {
       }
     }
 
-    // Upsert progress
     const progress = await prisma.progress.upsert({
-      where: { userId_day: { userId: user.id, day } },
+      where: { userId_day_cycle: { userId: user.id, day, cycle: currentCycle } },
       update: { completed: true },
-      create: { userId: user.id, day, completed: true },
+      create: { userId: user.id, day, cycle: currentCycle, completed: true },
     });
 
-    return NextResponse.json({ ...progress, athleteName: user.name });
+    const cycleReset = day === 7;
+
+    return NextResponse.json({
+      ...progress,
+      athleteName: user.name,
+      cycleReset,
+      currentCycle,
+    });
   } catch (error) {
     console.error("Erro ao salvar progresso:", error);
     return NextResponse.json({ error: "Erro interno do servidor." }, { status: 500 });

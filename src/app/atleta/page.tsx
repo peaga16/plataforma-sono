@@ -11,7 +11,7 @@ export default async function AthletePage() {
   if (!session?.user) redirect("/login");
 
   const userId = session.user.id;
-  const progress = await getUserProgress(userId);
+  const { progress, currentCycle } = await getUserProgress(userId);
   const completedDays = progress.filter((p) => p.completed).map((p) => p.day);
   const totalCompleted = completedDays.length;
   const pct = Math.round((totalCompleted / 7) * 100);
@@ -61,6 +61,7 @@ export default async function AthletePage() {
           <div>
             <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 12, fontFamily: "'DM Sans',sans-serif", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Progresso geral</p>
             <p style={{ color: "#F8F9FC", fontSize: 36, fontFamily: "'DM Serif Display',serif", margin: 0 }}>{pct}%</p>
+            <p style={{ color: "rgba(248,249,252,0.35)", fontSize: 11, fontFamily: "'DM Sans',sans-serif", margin: "4px 0 0" }}>Ciclo {currentCycle}</p>
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
