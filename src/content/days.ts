@@ -18,7 +18,7 @@ export const daysContent = [
       "Demonstração prática de um ambiente adequado para o sono no alojamento esportivo.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/1.mp4?vercel-blob-valid-until=1779157422096&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwMjA1Nzg2LCJpYXQiOjE3NzkxNTY5NzczOTF9.616LXPigy35NzHCjJSh19WfG8HUdr6s0ocLsgiMUInQ&vercel-blob-signature=GBqtKN0D2vDnkmc4hevBv71LWvSyqN5mh3FFPolFl9A",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/1.mp4",
 
     medal:
       "🌙 Guardião do Sono – Dia 1",
@@ -44,7 +44,7 @@ export const daysContent = [
       "Explicação sobre luz azul e impacto na produção de melatonina.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/2.mp4?vercel-blob-valid-until=1779157422096&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwMjA1Nzg2LCJpYXQiOjE3NzkxNTY5NzczOTF9.616LXPigy35NzHCjJSh19WfG8HUdr6s0ocLsgiMUInQ&vercel-blob-signature=GBqtKN0D2vDnkmc4hevBv71LWvSyqN5mh3FFPolFl9A",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/2.mp4",
 
     medal:
       "📵 Desafio Sem Tela – Concluído",
@@ -69,7 +69,7 @@ export const daysContent = [
       "Explicação simples sobre ritmo biológico e desempenho esportivo.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/3.mp4?vercel-blob-valid-until=1779157486696&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwMjA1Nzg2LCJpYXQiOjE3NzkxNTY5NzczOTF9.616LXPigy35NzHCjJSh19WfG8HUdr6s0ocLsgiMUInQ&vercel-blob-signature=F-uEMgNR9OA4rcbZSgozzJ1u5qH5zOpNhDGyKPpH1vo",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/3.mp4",
 
     medal:
       "⏰ Ritmo Campeão – Dia 3",
@@ -94,7 +94,7 @@ export const daysContent = [
       "Exemplo de hábitos que aumentam a eficiência do sono.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/4.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwNjQwMzA5LCJpYXQiOjE3NzkxNTc0MTIxMjN9.zmBpHMFclLwYZQZrBUuSehkKLaInTCJXNIU2t8Wkxwk&vercel-blob-signature=ebYRmHku4u5H7Kbuz1Ck6wUIt2b1ExHTZJoNoMjDzzI",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/4.mp4",
 
     medal:
       "🛏 Sono Eficiente – Desbloqueada",
@@ -120,7 +120,7 @@ export const daysContent = [
       "Explicação sobre substâncias estimulantes e qualidade do sono.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/5.mp4?vercel-blob-valid-until=1779157533893&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwNjY3MDExLCJpYXQiOjE3NzkxNTc0Mzg4MjV9.TJnteUBczbzejv2gvIwZRew-8jkMqdwknAEfpuhwUDU&vercel-blob-signature=K5Ez9lPVOoi5avVLIMdaj-trgdu1HAusg_IuyPR69q0",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/5.mp4",
 
     medal:
       "⚡ Energia Inteligente – Dia 5",
@@ -145,7 +145,7 @@ export const daysContent = [
       "Relação entre álcool, fadiga e desempenho esportivo.",
 
     videoUrl:
-      "https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/6.mp4?vercel-blob-valid-until=1779157562317&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwNjY3MDExLCJpYXQiOjE3NzkxNTc0Mzg4MjV9.TJnteUBczbzejv2gvIwZRew-8jkMqdwknAEfpuhwUDU&vercel-blob-signature=ni6dLqZh-vgHZFD9EYYLZyICP6jXUHCv-h7EXGyYOKI",
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/6.mp4",
 
     medal:
       "🏅 Recuperação Máxima – Dia 6",
@@ -172,7 +172,7 @@ export const daysContent = [
       "Resumo motivacional mostrando relação entre sono, recuperação e performance esportiva.",
 
     videoUrl:
-      ",https://szr0aigyo8z36p3p.private.blob.vercel-storage.com/7.mp4?vercel-blob-valid-until=1779157583747&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfc1pSMGFJZ1lvOHozNnAzUCIsIm93bmVySWQiOiJ0ZWFtX1VjOFRKSmNHcUhIclFva2hzNzlGUjdJUyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzc5MjAwNjY3MDExLCJpYXQiOjE3NzkxNTc0Mzg4MjV9.TJnteUBczbzejv2gvIwZRew-8jkMqdwknAEfpuhwUDU&vercel-blob-signature=dnVYKLK4CYMn_vszBXO6WrGahUn8sXjNRiclWWvnm6I"
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/7.mp4"
 
     medal:
       "🥇 Missão Sono Completa",
