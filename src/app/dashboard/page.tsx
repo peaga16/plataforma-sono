@@ -5,9 +5,11 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+interface Progress { day: number; completed: boolean; cycle: number; }
+
 interface Athlete {
   id: string; name: string; code: string | null; email: string;
-  progresses: { day: number; completed: boolean }[];
+  progresses: Progress[];
 }
 
 export default function DashboardPage() {
@@ -19,7 +21,7 @@ export default function DashboardPage() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkResult, setBulkResult] = useState<{ name: string; code: string }[] | null>(null);
   const [tab, setTab] = useState<"athletes" | "register">("athletes");
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -45,21 +47,40 @@ export default function DashboardPage() {
     else alert(data.error || "Erro ao cadastrar.");
   }
 
-  function copyLink(code: string) {
-    const url = `${baseUrl}/login?code=${code}`;
-    navigator.clipboard.writeText(url);
-    alert(`Link copiado!\n${url}`);
+  // Calcula o ciclo atual de um atleta (maior ciclo com dias completos, ou se o último ciclo tem 7 dias = próximo)
+  function getCurrentCycle(progresses: Progress[]): number {
+    const completed = progresses.filter((p) => p.completed);
+    if (!completed.length) return 1;
+    const maxCycle = Math.max(...completed.map((p) => p.cycle));
+    const daysInMaxCycle = completed.filter((p) => p.cycle === maxCycle).length;
+    return daysInMaxCycle >= 7 ? maxCycle + 1 : maxCycle;
   }
 
-  function qrUrl(code: string) {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${baseUrl}/login?code=${code}`)}`;
+  // Agrupa progresso por ciclo
+  function groupByCycle(progresses: Progress[]) {
+    const cycles: Record<number, number[]> = {};
+    progresses.filter((p) => p.completed).forEach((p) => {
+      if (!cycles[p.cycle]) cycles[p.cycle] = [];
+      cycles[p.cycle].push(p.day);
+    });
+    return cycles;
   }
 
   const athleteList = athletes.filter((u) => u.code?.startsWith("ATL"));
   const totalAthletes = athleteList.length;
-  const totalCompleted = athleteList.filter((u) => u.progresses.filter((p) => p.completed).length === 7).length;
+
+  // Conta atletas que completaram pelo menos 1 ciclo inteiro
+  const totalCompleted = athleteList.filter((u) => {
+    const cycles = groupByCycle(u.progresses);
+    return Object.values(cycles).some((days) => days.length >= 7);
+  }).length;
+
   const avgProgress = totalAthletes
-    ? Math.round(athleteList.reduce((sum, u) => sum + u.progresses.filter((p) => p.completed).length, 0) / totalAthletes / 7 * 100)
+    ? Math.round(athleteList.reduce((sum, u) => {
+        const currentCycle = getCurrentCycle(u.progresses);
+        const daysInCurrentCycle = u.progresses.filter((p) => p.completed && p.cycle === currentCycle).length;
+        return sum + daysInCurrentCycle;
+      }, 0) / totalAthletes / 7 * 100)
     : 0;
 
   const navStyle = (active: boolean): React.CSSProperties => ({
@@ -110,8 +131,8 @@ export default function DashboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 40 }}>
           {[
             { label: "Atletas cadastrados", value: totalAthletes, icon: "👤" },
-            { label: "Programa completo", value: totalCompleted, icon: "🏆" },
-            { label: "Progresso médio", value: `${avgProgress}%`, icon: "📊" },
+            { label: "Ciclos completos", value: totalCompleted, icon: "🏆" },
+            { label: "Progresso médio (ciclo atual)", value: `${avgProgress}%`, icon: "📊" },
           ].map((card) => (
             <div key={card.label} style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "24px 28px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
@@ -157,50 +178,124 @@ export default function DashboardPage() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--off-white)" }}>
-                    {["Atleta", "Código", "Progresso", "Dias", "QR Code"].map((h) => (
+                    {["Atleta", "Código", "Ciclo atual", "Progresso atual", "Histórico", ""].map((h) => (
                       <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.08em", textTransform: "uppercase" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {athleteList.map((user, i) => {
-                    const completed = user.progresses.filter((p) => p.completed).map((p) => p.day);
-                    const pct = Math.round((completed.length / 7) * 100);
+                    const currentCycle = getCurrentCycle(user.progresses);
+                    const cycles = groupByCycle(user.progresses);
+                    const currentCycleDays = user.progresses.filter((p) => p.completed && p.cycle === currentCycle).map((p) => p.day);
+                    const pct = Math.round((currentCycleDays.length / 7) * 100);
+                    const totalCycles = Object.keys(cycles).length;
+                    const completedCycles = Object.values(cycles).filter((days) => days.length >= 7).length;
+                    const isExpanded = expandedAthlete === user.id;
+
                     return (
-                      <tr key={user.id} style={{ borderBottom: i < athleteList.length - 1 ? "1px solid var(--off-white)" : "none" }}>
-                        <td style={{ padding: "16px 20px" }}>
-                          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500, color: "var(--navy)", margin: 0 }}>{user.name}</p>
-                        </td>
-                        <td style={{ padding: "16px 20px" }}>
-                          <span style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 13, color: "var(--navy)", background: "var(--off-white)", padding: "4px 10px", borderRadius: 6 }}>{user.code}</span>
-                        </td>
-                        <td style={{ padding: "16px 20px", minWidth: 160 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <div style={{ flex: 1, background: "var(--off-white)", borderRadius: 100, height: 6 }}>
-                              <div style={{ background: pct === 100 ? "var(--success)" : "#2B6CB0", height: 6, borderRadius: 100, width: `${pct}%` }} />
+                      <>
+                        <tr key={user.id} style={{ borderBottom: "1px solid var(--off-white)", background: isExpanded ? "#F8FAFF" : "#fff" }}>
+                          <td style={{ padding: "16px 20px" }}>
+                            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500, color: "var(--navy)", margin: 0 }}>{user.name}</p>
+                          </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            <span style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 13, color: "var(--navy)", background: "var(--off-white)", padding: "4px 10px", borderRadius: 6 }}>{user.code}</span>
+                          </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            <span style={{ background: "#EFF6FF", color: "#2B6CB0", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 100, fontFamily: "'DM Sans',sans-serif" }}>
+                              Ciclo {currentCycle}
+                            </span>
+                          </td>
+                          <td style={{ padding: "16px 20px", minWidth: 200 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                              {[1,2,3,4,5,6,7].map((d) => (
+                                <div key={d} style={{
+                                  width: 22, height: 22, borderRadius: 4, fontSize: 10, fontFamily: "'DM Sans',sans-serif",
+                                  display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600,
+                                  background: currentCycleDays.includes(d) ? "#2B6CB0" : "var(--off-white)",
+                                  color: currentCycleDays.includes(d) ? "#fff" : "var(--muted)",
+                                }}>{d}</div>
+                              ))}
                             </div>
-                            <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", width: 32 }}>{pct}%</span>
-                          </div>
-                        </td>
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ display: "flex", gap: 4 }}>
-                            {[1,2,3,4,5,6,7].map((d) => (
-                              <div key={d} style={{
-                                width: 22, height: 22, borderRadius: 4, fontSize: 10, fontFamily: "'DM Sans',sans-serif",
-                                display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600,
-                                background: completed.includes(d) ? "#2B6CB0" : "var(--off-white)",
-                                color: completed.includes(d) ? "#fff" : "var(--muted)",
-                              }}>{d}</div>
-                            ))}
-                          </div>
-                        </td>
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <img src={qrUrl(user.code!)} alt="QR" style={{ width: 40, height: 40, borderRadius: 4, border: "1px solid var(--border)" }} />
-                            <button onClick={() => copyLink(user.code!)} style={{ fontSize: 11, color: "#2B6CB0", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textDecoration: "underline" }}>Copiar link</button>
-                          </div>
-                        </td>
-                      </tr>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <div style={{ flex: 1, background: "var(--off-white)", borderRadius: 100, height: 5 }}>
+                                <div style={{ background: pct === 100 ? "#16A34A" : "#2B6CB0", height: 5, borderRadius: 100, width: `${pct}%` }} />
+                              </div>
+                              <span style={{ fontSize: 11, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>{pct}%</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                              <span style={{ fontSize: 13, fontFamily: "'DM Sans',sans-serif", color: "var(--navy)", fontWeight: 500 }}>
+                                {completedCycles} ciclo{completedCycles !== 1 ? "s" : ""} completo{completedCycles !== 1 ? "s" : ""}
+                              </span>
+                              <span style={{ fontSize: 11, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>
+                                {totalCycles} ciclo{totalCycles !== 1 ? "s" : ""} iniciado{totalCycles !== 1 ? "s" : ""}
+                              </span>
+                            </div>
+                          </td>
+                          <td style={{ padding: "16px 20px" }}>
+                            {totalCycles > 0 && (
+                              <button
+                                onClick={() => setExpandedAthlete(isExpanded ? null : user.id)}
+                                style={{ fontSize: 12, color: "#2B6CB0", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textDecoration: "underline" }}
+                              >
+                                {isExpanded ? "Fechar" : "Ver histórico"}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+
+                        {/* Expanded history row */}
+                        {isExpanded && (
+                          <tr key={`${user.id}-history`} style={{ borderBottom: i < athleteList.length - 1 ? "1px solid var(--border)" : "none" }}>
+                            <td colSpan={6} style={{ padding: "0 20px 20px 20px", background: "#F8FAFF" }}>
+                              <div style={{ borderTop: "1px solid #BFDBFE", paddingTop: 16 }}>
+                                <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>
+                                  Histórico de ciclos
+                                </p>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                                  {Object.entries(cycles).sort(([a], [b]) => Number(a) - Number(b)).map(([cycle, days]) => {
+                                    const isComplete = days.length >= 7;
+                                    return (
+                                      <div key={cycle} style={{
+                                        background: "#fff", border: `1px solid ${isComplete ? "#BFDBFE" : "var(--border)"}`,
+                                        borderRadius: 10, padding: "12px 16px", minWidth: 180,
+                                      }}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                                          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 600, color: "var(--navy)" }}>
+                                            Ciclo {cycle}
+                                          </span>
+                                          <span style={{
+                                            fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 100,
+                                            fontFamily: "'DM Sans',sans-serif",
+                                            background: isComplete ? "#DCFCE7" : "#FEF9C3",
+                                            color: isComplete ? "#166534" : "#854D0E",
+                                          }}>
+                                            {isComplete ? "✓ Completo" : `${days.length}/7 dias`}
+                                          </span>
+                                        </div>
+                                        <div style={{ display: "flex", gap: 4 }}>
+                                          {[1,2,3,4,5,6,7].map((d) => (
+                                            <div key={d} style={{
+                                              width: 20, height: 20, borderRadius: 4, fontSize: 9,
+                                              display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600,
+                                              fontFamily: "'DM Sans',sans-serif",
+                                              background: days.includes(d) ? "#2B6CB0" : "var(--off-white)",
+                                              color: days.includes(d) ? "#fff" : "var(--muted)",
+                                            }}>{d}</div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     );
                   })}
                 </tbody>
@@ -245,9 +340,6 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-            <p style={{ fontSize: 12, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", marginTop: 16, lineHeight: 1.6 }}>
-              Os códigos seguem o padrão <strong>ATL001</strong>, <strong>ATL002</strong>... e são únicos por atleta. O QR Code de cada atleta é gerado automaticamente na aba Atletas.
-            </p>
           </div>
         )}
 
