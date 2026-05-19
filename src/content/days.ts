@@ -172,7 +172,7 @@ export const daysContent = [
       "Resumo motivacional mostrando relação entre sono, recuperação e performance esportiva.",
 
     videoUrl:
-      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/7.mp4"
+      "https://k9ntjp6pezyzcwao.public.blob.vercel-storage.com/7.mp4",
 
     medal:
       "🥇 Missão Sono Completa",
