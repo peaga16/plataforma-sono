@@ -65,10 +65,15 @@ export async function POST(req: Request) {
 
 // GET /api/batch-register — lista todos os atletas com seus códigos
 export async function GET() {
-  const users = await prisma.user.findMany({
-    where: { code: { startsWith: "ATL" } },
-    select: { id: true, name: true, code: true },
-    orderBy: { code: "asc" },
-  });
-  return NextResponse.json(users);
+  try {
+    const users = await prisma.user.findMany({
+      where: { code: { startsWith: "ATL" } },
+      select: { id: true, name: true, code: true },
+      orderBy: { code: "asc" },
+    });
+    return NextResponse.json(users);
+  } catch (error) {
+    console.error("Erro ao listar atletas:", error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
 }

@@ -2,13 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const users = await prisma.user.findMany({
-    include: {
-      progresses: {
-        orderBy: [{ cycle: "asc" }, { day: "asc" }],
+  try {
+    const users = await prisma.user.findMany({
+      include: {
+        progresses: {
+          orderBy: [{ cycle: "asc" }, { day: "asc" }],
+        },
       },
-    },
-    orderBy: { code: "asc" },
-  });
-  return NextResponse.json(users);
+      orderBy: { code: "asc" },
+    });
+    return NextResponse.json(users);
+  } catch (error) {
+    console.error("Erro ao buscar dashboard:", error);
+    return NextResponse.json(
+      { error: "Erro interno do servidor." },
+      { status: 500 }
+    );
+  }
 }
