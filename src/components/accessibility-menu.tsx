@@ -31,7 +31,10 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
     <div ref={menuRef} style={{ position: "relative" }}>
       {/* Botão de acessibilidade */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
         title={t("accessibility")}
         style={{
           background: isDark ? "rgba(255,255,255,0.1)" : "rgba(13,27,42,0.08)",
@@ -49,13 +52,13 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
           padding: 0,
         } as React.CSSProperties}
         onMouseEnter={(e) => {
-          (e.target as HTMLButtonElement).style.background = isDark 
-            ? "rgba(255,255,255,0.15)" 
+          (e.currentTarget as HTMLButtonElement).style.background = isDark
+            ? "rgba(255,255,255,0.15)"
             : "rgba(13,27,42,0.12)";
         }}
         onMouseLeave={(e) => {
-          (e.target as HTMLButtonElement).style.background = isDark 
-            ? "rgba(255,255,255,0.1)" 
+          (e.currentTarget as HTMLButtonElement).style.background = isDark
+            ? "rgba(255,255,255,0.1)"
             : "rgba(13,27,42,0.08)";
         }}
       >
@@ -72,8 +75,8 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
             background: isDark ? "#0D1B2A" : "#F8F9FC",
             border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid var(--border)",
             borderRadius: 12,
-            boxShadow: isDark 
-              ? "0 20px 60px rgba(0,0,0,0.5)" 
+            boxShadow: isDark
+              ? "0 20px 60px rgba(0,0,0,0.5)"
               : "0 4px 12px rgba(0,0,0,0.08)",
             minWidth: 240,
             overflow: "hidden",
@@ -85,8 +88,8 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
           <div
             style={{
               padding: "16px",
-              borderBottom: isDark 
-                ? "1px solid rgba(255,255,255,0.08)" 
+              borderBottom: isDark
+                ? "1px solid rgba(255,255,255,0.08)"
                 : "1px solid var(--border)",
               display: "flex",
               alignItems: "center",
@@ -171,8 +174,8 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
           <div
             style={{
               padding: "12px",
-              borderTop: isDark 
-                ? "1px solid rgba(255,255,255,0.08)" 
+              borderTop: isDark
+                ? "1px solid rgba(255,255,255,0.08)"
                 : "1px solid var(--border)",
             }}
           >
@@ -229,11 +232,12 @@ interface LanguageButtonProps {
 function LanguageButton({ isActive, onClick, label, isDark }: LanguageButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       style={{
         width: "100%",
         padding: "8px 12px",
-        background: isActive 
+        background: isActive
           ? isDark ? "rgba(74,144,217,0.2)" : "rgba(74,144,217,0.1)"
           : isDark ? "rgba(255,255,255,0.05)" : "rgba(13,27,42,0.05)",
         border: isActive ? "1px solid #4A90D9" : isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid var(--border)",
@@ -251,14 +255,14 @@ function LanguageButton({ isActive, onClick, label, isDark }: LanguageButtonProp
       } as React.CSSProperties}
       onMouseEnter={(e) => {
         if (!isActive) {
-          (e.target as HTMLButtonElement).style.background = isDark
+          (e.currentTarget as HTMLButtonElement).style.background = isDark
             ? "rgba(255,255,255,0.08)"
             : "rgba(13,27,42,0.08)";
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          (e.target as HTMLButtonElement).style.background = isDark
+          (e.currentTarget as HTMLButtonElement).style.background = isDark
             ? "rgba(255,255,255,0.05)"
             : "rgba(13,27,42,0.05)";
         }

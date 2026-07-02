@@ -7,7 +7,7 @@ import { getTranslation, type TranslationKey } from "@/lib/translations";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -22,15 +22,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Carrega idioma do localStorage na montagem
     const savedLanguage = localStorage.getItem("platform-language") as Language | null;
-    if (savedLanguage) {
-      setLanguageState(savedLanguage);
-    }
+    const activeLanguage = savedLanguage ?? DEFAULT_LANGUAGE;
+    setLanguageState(activeLanguage);
+    document.documentElement.lang = activeLanguage === "en" ? "en" : "pt-BR";
     setMounted(true);
 
     // Listener para mudanças de storage (quando muda em outra aba)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "platform-language" && e.newValue) {
-        setLanguageState(e.newValue as Language);
+        const newLanguage = e.newValue as Language;
+        setLanguageState(newLanguage);
+        document.documentElement.lang = newLanguage === "en" ? "en" : "pt-BR";
       }
     };
 
@@ -44,8 +46,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
   };
 
-  const t = (key: TranslationKey): string => {
-    return getTranslation(language, key);
+  const t = (key: TranslationKey, params?: Record<string, string | number>): string => {
+    return getTranslation(language, key, params);
   };
 
   return (
@@ -57,7 +59,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage(): LanguageContextType {
   const context = useContext(LanguageContext);
-  
+
   // Se o contexto não existir, retorna um objeto funcional
   // com fallback que funciona para SSR
   if (context === undefined) {
@@ -70,9 +72,17 @@ export function useLanguage(): LanguageContextType {
           localStorage.setItem("platform-language", lang);
         }
       },
-      t: (key: TranslationKey) => key,
+      t: (key: TranslationKey, params?: Record<string, string | number>) => {
+        let value = key;
+        if (params) {
+          Object.entries(params).forEach(([param, paramValue]) => {
+            value = value.replace(new RegExp(`\\{${param}\\}`, "g"), String(paramValue));
+          });
+        }
+        return value;
+      },
     };
   }
-  
+
   return context;
 }

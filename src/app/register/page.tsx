@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export default function RegisterPage() {
 
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +34,7 @@ export default function RegisterPage() {
       router.push("/login");
     } else {
       const data = await response.json();
-      setError(data.error || "Erro ao criar conta.");
+      setError(data.error || t("createAccountError"));
     }
   }
 
@@ -42,11 +44,11 @@ export default function RegisterPage() {
       <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md">
 
         <h1 className="text-3xl font-bold mb-2">
-          Criar conta
+          {t("registerTitle")}
         </h1>
 
         <p className="text-zinc-500 mb-8">
-          Cadastre-se para acessar a plataforma.
+          {t("registerDescription")}
         </p>
 
         {error && (
@@ -57,7 +59,7 @@ export default function RegisterPage() {
 
         <input
           type="text"
-          placeholder="Nome"
+          placeholder={t("namePlaceholder")}
           className="w-full border p-3 rounded-xl mb-4"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -65,7 +67,7 @@ export default function RegisterPage() {
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("emailPlaceholder")}
           className="w-full border p-3 rounded-xl mb-4"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -73,7 +75,7 @@ export default function RegisterPage() {
 
         <input
           type="password"
-          placeholder="Senha"
+          placeholder={t("passwordPlaceholder")}
           className="w-full border p-3 rounded-xl mb-6"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -85,13 +87,13 @@ export default function RegisterPage() {
           disabled={loading}
           className="w-full bg-black text-white p-3 rounded-xl disabled:opacity-50"
         >
-          {loading ? "Criando conta..." : "Criar conta"}
+          {loading ? t("creatingAccount") : t("createAccount")}
         </button>
 
         <p className="text-center text-sm text-zinc-400 mt-6">
-          Já tem conta?{" "}
+          {t("alreadyHaveAccount")} {" "}
           <Link href="/login" className="text-black font-medium underline">
-            Entrar
+            {t("loginLink")}
           </Link>
         </p>
 

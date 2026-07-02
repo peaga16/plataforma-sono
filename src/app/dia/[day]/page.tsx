@@ -5,8 +5,10 @@ import { useParams } from "next/navigation";
 import { daysContent } from "@/content/days";
 import { VideoPlayer } from "@/components/video-player";
 import Link from "next/link";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export default function PublicDayPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const dayParam = params.day as string;
   const dayNumber = Number(dayParam.replace("dia-", ""));
@@ -19,7 +21,10 @@ export default function PublicDayPage() {
   const [athleteName, setAthleteName] = useState("");
 
   async function handleComplete() {
-    if (!code.trim()) { setErrorMsg("Digite seu código de atleta."); return; }
+    if (!code.trim()) {
+      setErrorMsg(t("enterAthleteCode"));
+      return;
+    }
     setStatus("loading");
     setErrorMsg("");
     try {
@@ -31,21 +36,21 @@ export default function PublicDayPage() {
       const data = await res.json();
       if (!res.ok) {
         setStatus("error");
-        setErrorMsg(data.error || "Erro ao salvar progresso.");
+        setErrorMsg(data.error || t("saveError"));
       } else {
         setStatus("success");
         setAthleteName(data.athleteName || "");
       }
     } catch {
       setStatus("error");
-      setErrorMsg("Erro de conexão. Tente novamente.");
+      setErrorMsg(t("connectionError"));
     }
   }
 
   if (!content) {
     return (
       <main style={{ minHeight: "100vh", background: "var(--off-white)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>Conteúdo não encontrado.</p>
+        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>{t("contentNotFound")}</p>
       </main>
     );
   }
@@ -61,14 +66,14 @@ export default function PublicDayPage() {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: 6, background: "linear-gradient(135deg,#2B6CB0,#4A90D9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🌙</div>
-          <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>Plataforma do Sono</span>
+          <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>{t("platformName")}</span>
         </div>
         <span style={{
           background: "#EFF6FF", color: "#2B6CB0", border: "1px solid #BFDBFE",
           fontSize: 11, fontWeight: 600, padding: "5px 12px", borderRadius: 100,
           fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.08em", textTransform: "uppercase",
         }}>
-          Dia {content.day} de 7
+          {t("dayOfSeven", { number: content.day.toString() })}
         </span>
       </header>
 
@@ -93,7 +98,7 @@ export default function PublicDayPage() {
         {/* Infographic */}
         <section style={{ marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 24, color: "var(--navy)", margin: "0 0 20px", fontWeight: 400 }}>
-            Recomendações
+            {t("recommendations")}
           </h2>
           <div style={{ display: "grid", gap: 12 }}>
             {content.infographic.map((item, i) => {
@@ -118,7 +123,7 @@ export default function PublicDayPage() {
         {/* Video */}
         <section style={{ marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 24, color: "var(--navy)", margin: "0 0 20px", fontWeight: 400 }}>
-            Vídeo educativo
+            {t("educationalVideo")}
           </h2>
           <p style={{ color: "var(--muted)", fontSize: 13, fontFamily: "'DM Sans',sans-serif", marginBottom: 16 }}>
             {content.videoTitle}
@@ -136,7 +141,7 @@ export default function PublicDayPage() {
         }}>
           <div style={{ fontSize: 40 }}>{content.medal.split(" ")[0]}</div>
           <div>
-            <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 11, fontFamily: "'DM Sans',sans-serif", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Medalha do dia</p>
+            <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 11, fontFamily: "'DM Sans',sans-serif", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{t("dayMedal")}</p>
             <p style={{ color: "#F8F9FC", fontSize: 18, fontFamily: "'DM Serif Display',serif", margin: 0 }}>
               {content.medal.slice(content.medal.indexOf(" ") + 1)}
             </p>
@@ -159,32 +164,32 @@ export default function PublicDayPage() {
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🏅</div>
               <h3 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 24, color: "var(--navy)", margin: "0 0 8px", fontWeight: 400 }}>
-                Dia {dayNumber} concluído!
+                {t("dayCompleted", { number: dayNumber.toString() })}
               </h3>
               {athleteName && (
                 <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", fontSize: 14, margin: "0 0 4px" }}>
-                  Parabéns, <strong style={{ color: "var(--navy)" }}>{athleteName}</strong>!
+                  {t("congratulations", { name: athleteName })}
                 </p>
               )}
               <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", fontSize: 14, margin: 0 }}>
-                Seu progresso foi registrado com sucesso. Até amanhã! 🌙
+                {t("progressSaved")}
               </p>
             </div>
           ) : (
             <>
               <h3 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 22, color: "var(--navy)", margin: "0 0 8px", fontWeight: 400 }}>
-                Marcar presença
+                {t("markAttendance")}
               </h3>
               <p style={{ color: "var(--muted)", fontSize: 14, fontFamily: "'DM Sans',sans-serif", margin: "0 0 24px" }}>
                 {!videoWatched
-                  ? "Assista ao vídeo acima e depois insira seu código para confirmar a presença."
-                  : "Insira seu código de atleta para confirmar que assistiu ao conteúdo de hoje."}
+                  ? t("watchVideoInstruction")
+                  : t("enterCodeConfirmation")}
               </p>
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <input
                     type="text"
-                    placeholder="Seu código (ex: ATL001)"
+                    placeholder={t("athleteCodePlaceholder")}
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     onKeyDown={(e) => e.key === "Enter" && handleComplete()}
@@ -202,7 +207,7 @@ export default function PublicDayPage() {
                 <button
                   onClick={handleComplete}
                   disabled={status === "loading" || !videoWatched}
-                  title={!videoWatched ? "Assista ao vídeo primeiro" : ""}
+                  title={!videoWatched ? t("watchVideoFirst") : ""}
                   style={{
                     background: videoWatched ? "var(--navy)" : "#9CA3AF",
                     color: "#fff", border: "none", borderRadius: 8,
@@ -213,12 +218,12 @@ export default function PublicDayPage() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {status === "loading" ? "Salvando..." : "✓ Confirmar presença"}
+                  {status === "loading" ? t("saving") : t("confirmAttendance")}
                 </button>
               </div>
               {!videoWatched && (
                 <p style={{ color: "var(--muted)", fontSize: 12, fontFamily: "'DM Sans',sans-serif", marginTop: 10 }}>
-                  ⬆ Assista ao vídeo completo para habilitar a confirmação.
+                  {t("watchVideoRequired")}
                 </p>
               )}
             </>

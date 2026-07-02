@@ -28,6 +28,7 @@ export default function Home() {
       {/* Decorative grid overlay */}
       <div style={{
         position: "absolute", inset: 0, opacity: 0.04,
+        pointerEvents: "none",
         backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
         backgroundSize: "60px 60px",
       }} />

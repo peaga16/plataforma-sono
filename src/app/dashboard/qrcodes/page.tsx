@@ -5,10 +5,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { daysContent } from "@/content/days";
 import Link from "next/link";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export default function QRCodesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [baseUrl, setBaseUrl] = useState("");
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function QRCodesPage() {
   if (status === "loading" || !baseUrl) {
     return (
       <main style={{ minHeight: "100vh", background: "var(--off-white)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>Carregando...</p>
+        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>{t("loading")}</p>
       </main>
     );
   }
@@ -63,7 +65,7 @@ export default function QRCodesPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <Link href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
               <span style={{ color: "rgba(248,249,252,0.5)", fontSize: 18 }}>←</span>
-              <span style={{ color: "rgba(248,249,252,0.6)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" }}>Voltar ao painel</span>
+              <span style={{ color: "rgba(248,249,252,0.6)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" }}>{t("backToDashboard")}</span>
             </Link>
             <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -79,7 +81,7 @@ export default function QRCodesPage() {
               fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 8,
             }}
           >
-            🖨️ Imprimir todos os QR Codes
+            {t("printAllQRCodes")}
           </button>
         </header>
 
@@ -94,10 +96,10 @@ export default function QRCodesPage() {
             <span style={{ fontSize: 20 }}>ℹ️</span>
             <div>
               <p style={{ color: "#1E40AF", fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 600, margin: "0 0 4px" }}>
-                Como usar os QR Codes
+                {t("qrCodesHowToTitle")}
               </p>
               <p style={{ color: "#3B82F6", fontFamily: "'DM Sans',sans-serif", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-                Imprima este arquivo e cole <strong>um QR Code por dia</strong> na sala. Cada atleta escaneia o QR do dia atual, assiste ao vídeo e insere seu código (ex: ATL001) para marcar presença — sem precisar fazer login.
+                {t("qrCodesInfo")}
               </p>
             </div>
           </div>
@@ -125,7 +127,7 @@ export default function QRCodesPage() {
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
                   <div style={{ width: 36, height: 36, borderRadius: 8, background: "linear-gradient(135deg,#2B6CB0,#4A90D9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🌙</div>
-                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 16, color: "var(--navy)" }}>Plataforma do Sono</span>
+                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 16, color: "var(--navy)" }}>{t("platformName")}</span>
                 </div>
 
                 {/* Day badge */}
@@ -135,7 +137,7 @@ export default function QRCodesPage() {
                   fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.1em", textTransform: "uppercase",
                   marginBottom: 16,
                 }}>
-                  DIA {day.day} DE 7
+                  {t("dayBadge", { day: day.day })}
                 </span>
 
                 {/* Title */}
@@ -172,17 +174,17 @@ export default function QRCodesPage() {
                   maxWidth: 420, marginBottom: 20,
                 }}>
                   <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: "var(--navy)", fontWeight: 600, margin: "0 0 8px" }}>
-                    Como usar:
+                    {t("howToUse")}
                   </p>
                   <ol style={{ textAlign: "left", paddingLeft: 18, margin: 0 }}>
                     <li style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "var(--muted)", marginBottom: 4, lineHeight: 1.5 }}>
-                      Escaneie o QR Code com seu celular
+                      {t("scanQRCode")}
                     </li>
                     <li style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "var(--muted)", marginBottom: 4, lineHeight: 1.5 }}>
-                      Assista ao vídeo educativo até o final
+                      {t("watchVideo")}
                     </li>
                     <li style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "var(--muted)", lineHeight: 1.5 }}>
-                      Digite seu código de atleta (ex: <strong style={{ color: "var(--navy)", fontFamily: "monospace" }}>ATL001</strong>) e confirme
+                      {t("enterCodeConfirm").replace("ATL001", "ATL001")}
                     </li>
                   </ol>
                 </div>
@@ -201,7 +203,7 @@ export default function QRCodesPage() {
                   fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: "#9CA3AF",
                   margin: "16px 0 0",
                 }}>
-                  Medalha: {day.medal}
+                  {t("medalLabel")} {day.medal}
                 </p>
               </div>
             );
