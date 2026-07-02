@@ -3,12 +3,19 @@
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/language-provider";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <main
+      key={`home-${t("platformName")}`}
       style={{
         minHeight: "100vh",
         background: "linear-gradient(160deg, #0D1B2A 0%, #1A2E45 50%, #0D1B2A 100%)",
