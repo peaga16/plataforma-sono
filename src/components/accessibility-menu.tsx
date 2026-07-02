@@ -3,10 +3,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "./providers/language-provider";
 
-export function AccessibilityMenu() {
+interface AccessibilityMenuProps {
+  variant?: "dark" | "light";
+}
+
+export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { language, setLanguage, t } = useLanguage();
+  const isDark = variant === "dark";
 
   // Fecha menu ao clicar fora
   useEffect(() => {
@@ -29,8 +34,8 @@ export function AccessibilityMenu() {
         onClick={() => setIsOpen(!isOpen)}
         title={t("accessibility")}
         style={{
-          background: "rgba(255,255,255,0.1)",
-          border: "1px solid rgba(255,255,255,0.2)",
+          background: isDark ? "rgba(255,255,255,0.1)" : "rgba(13,27,42,0.08)",
+          border: isDark ? "1px solid rgba(255,255,255,0.2)" : "1px solid var(--border)",
           borderRadius: 8,
           width: 36,
           height: 36,
@@ -39,15 +44,19 @@ export function AccessibilityMenu() {
           justifyContent: "center",
           cursor: "pointer",
           transition: "all 0.2s",
-          color: "rgba(248,249,252,0.7)",
+          color: isDark ? "rgba(248,249,252,0.7)" : "var(--navy)",
           fontSize: 18,
           padding: 0,
         } as React.CSSProperties}
         onMouseEnter={(e) => {
-          (e.target as HTMLButtonElement).style.background = "rgba(255,255,255,0.15)";
+          (e.target as HTMLButtonElement).style.background = isDark 
+            ? "rgba(255,255,255,0.15)" 
+            : "rgba(13,27,42,0.12)";
         }}
         onMouseLeave={(e) => {
-          (e.target as HTMLButtonElement).style.background = "rgba(255,255,255,0.1)";
+          (e.target as HTMLButtonElement).style.background = isDark 
+            ? "rgba(255,255,255,0.1)" 
+            : "rgba(13,27,42,0.08)";
         }}
       >
         ♿
@@ -60,10 +69,12 @@ export function AccessibilityMenu() {
             position: "absolute",
             top: "calc(100% + 8px)",
             right: 0,
-            background: "#0D1B2A",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: isDark ? "#0D1B2A" : "#F8F9FC",
+            border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid var(--border)",
             borderRadius: 12,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            boxShadow: isDark 
+              ? "0 20px 60px rgba(0,0,0,0.5)" 
+              : "0 4px 12px rgba(0,0,0,0.08)",
             minWidth: 240,
             overflow: "hidden",
             zIndex: 1000,
@@ -74,7 +85,9 @@ export function AccessibilityMenu() {
           <div
             style={{
               padding: "16px",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: isDark 
+                ? "1px solid rgba(255,255,255,0.08)" 
+                : "1px solid var(--border)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -82,7 +95,7 @@ export function AccessibilityMenu() {
           >
             <span
               style={{
-                color: "#F8F9FC",
+                color: isDark ? "#F8F9FC" : "var(--navy)",
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: "'DM Sans', sans-serif",
@@ -95,7 +108,7 @@ export function AccessibilityMenu() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(248,249,252,0.5)",
+                color: isDark ? "rgba(248,249,252,0.5)" : "var(--muted)",
                 cursor: "pointer",
                 fontSize: 18,
                 padding: 0,
@@ -120,7 +133,7 @@ export function AccessibilityMenu() {
             <p
               style={{
                 margin: "0 0 8px 0",
-                color: "rgba(248,249,252,0.6)",
+                color: isDark ? "rgba(248,249,252,0.6)" : "var(--muted)",
                 fontSize: 12,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -140,6 +153,7 @@ export function AccessibilityMenu() {
                   setIsOpen(false);
                 }}
                 label={t("portuguese")}
+                isDark={isDark}
               />
               <LanguageButton
                 isActive={language === "en"}
@@ -148,6 +162,7 @@ export function AccessibilityMenu() {
                   setIsOpen(false);
                 }}
                 label={t("english")}
+                isDark={isDark}
               />
             </div>
           </div>
@@ -156,13 +171,15 @@ export function AccessibilityMenu() {
           <div
             style={{
               padding: "12px",
-              borderTop: "1px solid rgba(255,255,255,0.08)",
+              borderTop: isDark 
+                ? "1px solid rgba(255,255,255,0.08)" 
+                : "1px solid var(--border)",
             }}
           >
             <p
               style={{
                 margin: "0 0 8px 0",
-                color: "rgba(248,249,252,0.6)",
+                color: isDark ? "rgba(248,249,252,0.6)" : "var(--muted)",
                 fontSize: 12,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -175,7 +192,7 @@ export function AccessibilityMenu() {
             <p
               style={{
                 margin: 0,
-                color: "rgba(248,249,252,0.4)",
+                color: isDark ? "rgba(248,249,252,0.4)" : "var(--muted)",
                 fontSize: 12,
                 fontFamily: "'DM Sans', sans-serif",
               }}
@@ -206,19 +223,22 @@ interface LanguageButtonProps {
   isActive: boolean;
   onClick: () => void;
   label: string;
+  isDark: boolean;
 }
 
-function LanguageButton({ isActive, onClick, label }: LanguageButtonProps) {
+function LanguageButton({ isActive, onClick, label, isDark }: LanguageButtonProps) {
   return (
     <button
       onClick={onClick}
       style={{
         width: "100%",
         padding: "8px 12px",
-        background: isActive ? "rgba(74,144,217,0.2)" : "rgba(255,255,255,0.05)",
-        border: isActive ? "1px solid #4A90D9" : "1px solid rgba(255,255,255,0.1)",
+        background: isActive 
+          ? isDark ? "rgba(74,144,217,0.2)" : "rgba(74,144,217,0.1)"
+          : isDark ? "rgba(255,255,255,0.05)" : "rgba(13,27,42,0.05)",
+        border: isActive ? "1px solid #4A90D9" : isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid var(--border)",
         borderRadius: 8,
-        color: isActive ? "#4A90D9" : "rgba(248,249,252,0.7)",
+        color: isActive ? "#4A90D9" : isDark ? "rgba(248,249,252,0.7)" : "var(--navy)",
         fontSize: 13,
         cursor: "pointer",
         fontFamily: "'DM Sans', sans-serif",
@@ -228,15 +248,19 @@ function LanguageButton({ isActive, onClick, label }: LanguageButtonProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-      }}
+      } as React.CSSProperties}
       onMouseEnter={(e) => {
         if (!isActive) {
-          (e.target as HTMLButtonElement).style.background = "rgba(255,255,255,0.08)";
+          (e.target as HTMLButtonElement).style.background = isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(13,27,42,0.08)";
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          (e.target as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+          (e.target as HTMLButtonElement).style.background = isDark
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(13,27,42,0.05)";
         }
       }}
     >

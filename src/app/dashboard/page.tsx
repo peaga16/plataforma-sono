@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Header } from "@/components/header";
+import { AccessibilityMenu } from "@/components/accessibility-menu";
 
 interface Progress {
   day: number;
@@ -465,6 +467,8 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <AccessibilityMenu variant="dark" />
+            
             <Link href="/api/auth/signout" className="dash-signout">
               Sair
             </Link>

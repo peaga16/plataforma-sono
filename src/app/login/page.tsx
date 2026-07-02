@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { Header } from "@/components/header";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -45,15 +46,17 @@ function LoginForm() {
   };
 
   return (
-    <main style={{
-      minHeight: "100vh", display: "flex",
-      background: "linear-gradient(160deg, #0D1B2A 0%, #1A2E45 100%)",
-    }}>
-      {/* Left panel */}
-      <div style={{
-        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "60px", position: "relative", overflow: "hidden",
+    <>
+      <Header variant="dark" title="Plataforma do Sono" />
+      <main style={{
+        minHeight: "calc(100vh - 64px)", display: "flex",
+        background: "linear-gradient(160deg, #0D1B2A 0%, #1A2E45 100%)",
       }}>
+        {/* Left panel */}
+        <div style={{
+          flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "60px", position: "relative", overflow: "hidden",
+        }}>
         <div style={{
           position: "absolute", inset: 0, opacity: 0.04,
           backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
@@ -175,7 +178,8 @@ function LoginForm() {
           </p>
         </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 
