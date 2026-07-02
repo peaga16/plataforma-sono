@@ -42,10 +42,7 @@ export function AccessibilityMenu() {
           color: "rgba(248,249,252,0.7)",
           fontSize: 18,
           padding: 0,
-          hover: {
-            background: "rgba(255,255,255,0.15)",
-          },
-        }}
+        } as React.CSSProperties}
         onMouseEnter={(e) => {
           (e.target as HTMLButtonElement).style.background = "rgba(255,255,255,0.15)";
         }}
