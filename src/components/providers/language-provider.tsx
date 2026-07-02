@@ -73,7 +73,7 @@ export function useLanguage(): LanguageContextType {
         }
       },
       t: (key: TranslationKey, params?: Record<string, string | number>) => {
-        let value = key;
+        let value: string = key;
         if (params) {
           Object.entries(params).forEach(([param, paramValue]) => {
             value = value.replace(new RegExp(`\\{${param}\\}`, "g"), String(paramValue));
