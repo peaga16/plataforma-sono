@@ -12,12 +12,21 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Valor padrão para usar quando o contexto não está disponível
+const DEFAULT_LANGUAGE: Language = "pt-BR";
+
+const defaultContextValue: LanguageContextType = {
+  language: DEFAULT_LANGUAGE,
+  setLanguage: () => {},
+  t: (key: TranslationKey) => key,
+};
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("pt-BR");
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
   const [mounted, setMounted] = useState(false);
 
-  // Carrega idioma do localStorage na montagem
   useEffect(() => {
+    // Carrega idioma do localStorage na montagem
     const savedLanguage = localStorage.getItem("platform-language") as Language | null;
     if (savedLanguage) {
       setLanguageState(savedLanguage);
@@ -35,10 +44,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return getTranslation(language, key);
   };
 
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
@@ -48,13 +53,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) {
-    // Retorna valor padrão em vez de lançar erro
-    return {
-      language: "pt-BR" as Language,
-      setLanguage: () => {},
-      t: (key: TranslationKey) => key,
-    };
+  
+  // Se o contexto não existir, retorna valor padrão
+  // Isso previne erros durante SSR/prerendering
+  if (context === undefined) {
+    return defaultContextValue;
   }
+  
   return context;
 }
