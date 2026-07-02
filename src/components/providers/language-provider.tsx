@@ -26,6 +26,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(savedLanguage);
     }
     setMounted(true);
+
+    // Listener para mudanças de storage (quando muda em outra aba)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "platform-language" && e.newValue) {
+        setLanguageState(e.newValue as Language);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const setLanguage = (lang: Language) => {
