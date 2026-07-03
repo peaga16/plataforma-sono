@@ -29,7 +29,7 @@ export default function DayPage() {
   if (status === "loading") {
     return (
       <main style={{ minHeight: "100vh", background: "var(--off-white)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>Carregando...</p>
+        <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>{t("loading")}</p>
       </main>
     );
   }
@@ -40,7 +40,7 @@ export default function DayPage() {
   const dayNumber = Number(day.replace("dia-", ""));
   const content = daysContent.find((item) => item.day === dayNumber);
 
-  if (!content) return <main style={{ padding: 48 }}>Conteúdo não encontrado.</main>;
+  if (!content) return <main style={{ padding: 48 }}>{t("contentNotFound")}</main>;
 
   return (
     <main key={`day-${language}`} style={{ minHeight: "100vh", background: "var(--off-white)" }}>

@@ -178,7 +178,7 @@ export default function DashboardPage() {
         }}
       >
         <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>
-          Carregando dashboard...
+          {t("dashboardLoading")}
         </p>
       </main>
     );
@@ -442,7 +442,7 @@ export default function DashboardPage() {
                   whiteSpace: "nowrap",
                 }}
               >
-                Plataforma do Sono
+                {t("platformName")}
               </span>
             </div>
 
@@ -460,16 +460,16 @@ export default function DashboardPage() {
           {/* Desktop nav */}
           <div className="dash-nav-group">
             <button onClick={() => setTab("athletes")} style={navBtnStyle(tab === "athletes")}>
-              Atletas
+              {t("athletesLabel")}
             </button>
             <button onClick={() => setTab("register")} style={navBtnStyle(tab === "register")}>
-              Cadastrar
+              {t("registerLabel")}
             </button>
             <a
               href="/dashboard/qrcodes"
               style={{ ...navBtnStyle(false), textDecoration: "none", display: "inline-block" }}
             >
-              QR Codes
+              {t("qrcodesLabel")}
             </a>
           </div>
 
@@ -477,7 +477,7 @@ export default function DashboardPage() {
             <AccessibilityMenu variant="dark" />
             
             <Link href="/api/auth/signout" className="dash-signout">
-              Sair
+              {t("signOut")}
             </Link>
 
             {/* Mobile menu toggle */}
@@ -499,26 +499,26 @@ export default function DashboardPage() {
             className={`mobile-nav-btn ${tab === "athletes" ? "active" : ""}`}
             onClick={() => { setTab("athletes"); setMobileMenuOpen(false); }}
           >
-            Atletas
+            {t("athletesLabel")}
           </button>
           <button
             className={`mobile-nav-btn ${tab === "register" ? "active" : ""}`}
             onClick={() => { setTab("register"); setMobileMenuOpen(false); }}
           >
-            Cadastrar
+            {t("registerLabel")}
           </button>
           <a
             href="/dashboard/qrcodes"
             className="mobile-nav-btn"
           >
-            QR Codes
+            {t("qrcodesLabel")}
           </a>
           <Link
             href="/api/auth/signout"
             className="mobile-nav-btn"
             style={{ color: "#F87171" }}
           >
-            Sair
+            {t("signOut")}
           </Link>
         </div>
 
@@ -527,9 +527,9 @@ export default function DashboardPage() {
           {/* Stats cards */}
           <div className="dash-stats-grid">
             {[
-              { label: "Atletas cadastrados", value: totalAthletes, icon: "👤" },
-              { label: "Ciclos completos", value: totalCompleted, icon: "🏆" },
-              { label: "Progresso médio", value: `${avgProgress}%`, icon: "📊" },
+              { label: t("registeredAthletes"), value: totalAthletes, icon: "👤" },
+              { label: t("completedCycles"), value: totalCompleted, icon: "🏆" },
+              { label: t("averageProgress"), value: `${avgProgress}%`, icon: "📊" },
             ].map((card) => (
               <div key={card.label} className="dash-stat-card">
                 <div

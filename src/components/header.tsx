@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface HeaderProps {
   title?: string;
@@ -11,12 +12,14 @@ interface HeaderProps {
 }
 
 export function Header({ 
-  title = "Plataforma do Sono", 
+  title,
   rightContent,
   style = {},
   variant = "dark"
 }: HeaderProps) {
+  const { t } = useLanguage();
   const isDark = variant === "dark";
+  const displayTitle = title ?? t("platformName");
 
   return (
     <header
@@ -66,7 +69,7 @@ export function Header({
             fontSize: 14,
           }}
         >
-          {title}
+          {displayTitle}
         </span>
       </Link>
 

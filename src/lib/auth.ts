@@ -34,13 +34,13 @@ export const authOptions = {
           const user = await prisma.user.findUnique({
             where: { code },
           });
-          if (!user) return null;
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: "athlete",
-          };
+            if (!user) throw new Error("invalid_code");
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: "athlete",
+            };
         }
 
         // ── Fallback: email + senha ──────────────────────────────────
@@ -48,9 +48,9 @@ export const authOptions = {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string },
           });
-          if (!user || !user.password) return null;
-          const match = await bcrypt.compare(credentials.password, user.password);
-          if (!match) return null;
+          if (!user || !user.password) throw new Error("invalid_credentials");
+            const match = await bcrypt.compare(credentials.password, user.password);
+            if (!match) throw new Error("invalid_credentials");
           return {
             id: user.id,
             name: user.name,

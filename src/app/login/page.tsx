@@ -32,7 +32,10 @@ function LoginForm() {
     setError(""); setLoading(true);
     const result = await signIn("credentials", { code: code.trim().toUpperCase(), callbackUrl: "/atleta", redirect: false });
     setLoading(false);
-    if (result?.error) setError(t("invalidCode"));
+    if (result?.error) {
+      if (result.error === "invalid_code") setError(t("invalidCode"));
+      else setError(t("connectionError"));
+    }
     else if (result?.url) window.location.href = result.url;
   }
 
@@ -41,7 +44,10 @@ function LoginForm() {
     setError(""); setLoading(true);
     const result = await signIn("credentials", { email: adminEmail, password: adminPassword, callbackUrl: "/dashboard", redirect: false });
     setLoading(false);
-    if (result?.error) setError(t("connectionError"));
+    if (result?.error) {
+      if (result.error === "invalid_credentials") setError(t("connectionError"));
+      else setError(t("connectionError"));
+    }
     else if (result?.url) window.location.href = result.url;
   }
 
