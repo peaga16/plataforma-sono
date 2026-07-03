@@ -6,16 +6,26 @@ import { AccessibilityMenu } from "@/components/accessibility-menu";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [mounted, setMounted] = useState(false);
+  const [, setRenderTrigger] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Re-renderizar quando o idioma muda
+  useEffect(() => {
+    setRenderTrigger(prev => prev + 1);
+  }, [language]);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <main
-      key={`home-${t("platformName")}`}
+      key={`home-${language}-${mounted}`}
       style={{
         minHeight: "100vh",
         background: "linear-gradient(160deg, #0D1B2A 0%, #1A2E45 50%, #0D1B2A 100%)",

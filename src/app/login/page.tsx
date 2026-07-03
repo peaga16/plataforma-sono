@@ -8,18 +8,24 @@ import { useLanguage } from "@/components/providers/language-provider";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [code, setCode] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [mode, setMode] = useState<"code" | "admin">("code");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [, setRenderTrigger] = useState(0);
 
   useEffect(() => {
     const c = searchParams.get("code");
     if (c) setCode(c.toUpperCase());
   }, [searchParams]);
+
+  // Re-renderizar quando o idioma muda
+  useEffect(() => {
+    setRenderTrigger(prev => prev + 1);
+  }, [language]);
 
   async function handleCodeLogin() {
     if (!code.trim()) { setError(t("codeRequired")); return; }
@@ -49,8 +55,8 @@ function LoginForm() {
 
   return (
     <>
-      <Header variant="dark" title="Plataforma do Sono" />
-      <main style={{
+      <Header variant="dark" title={t("platformName")} />
+      <main key={`login-${language}`} style={{
         minHeight: "calc(100vh - 64px)", display: "flex",
         background: "linear-gradient(160deg, #0D1B2A 0%, #1A2E45 100%)",
       }}>
@@ -76,15 +82,15 @@ function LoginForm() {
               fontFamily: "'DM Serif Display', serif", color: "#F8F9FC",
               fontSize: 44, lineHeight: 1.15, margin: "0 0 20px", fontWeight: 400,
             }}>
-              Programa de<br />
-              <em style={{ color: "#C9A84C" }}>Higiene do Sono</em>
+              {t("heroTitle")}<br />
+              <em style={{ color: "#C9A84C" }}>{t("heroTitleHighlight")}</em>
             </h1>
             <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 15, lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}>
-              Sete dias de conteúdo educacional sobre recuperação, ritmo circadiano e desempenho esportivo.
+              {t("heroDescription")}<br />{t("heroSubDescription")}
             </p>
 
             <div style={{ marginTop: 48, display: "flex", flexDirection: "column", gap: 16 }}>
-              {["Ambiente ideal para dormir", "Controle de telas e melatonina", "Ritmo circadiano e performance"].map((item, i) => (
+              {[t("listItem1"), t("listItem2"), t("listItem3")].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(43,108,176,0.2)", border: "1px solid rgba(43,108,176,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ color: "#4A90D9", fontSize: 12, fontWeight: 600 }}>{i + 1}</span>

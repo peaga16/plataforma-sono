@@ -12,6 +12,7 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
   const menuRef = useRef<HTMLDivElement>(null);
   const { language, setLanguage, t } = useLanguage();
   const isDark = variant === "dark";
+  const [justChanged, setJustChanged] = useState(false);
 
   // Fecha menu ao clicar fora
   useEffect(() => {
@@ -26,6 +27,15 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isOpen]);
+
+  const handleLanguageChange = (lang: "pt-BR" | "en") => {
+    setLanguage(lang);
+    setJustChanged(true);
+    setTimeout(() => {
+      setJustChanged(false);
+      setIsOpen(false);  // Fechar DEPOIS que a mudança é aplicada
+    }, 800);  // Deixar o usuário ver a mensagem de confirmação
+  };
 
   return (
     <div ref={menuRef} style={{ position: "relative" }}>
@@ -127,6 +137,23 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
             </button>
           </div>
 
+          {/* Feedback visual */}
+          {justChanged && (
+            <div
+              style={{
+                padding: "8px 16px",
+                background: "rgba(74,144,217,0.2)",
+                color: "#4A90D9",
+                fontSize: 12,
+                fontFamily: "'DM Sans', sans-serif",
+                textAlign: "center",
+                animation: "fadeInOut 1.5s ease-in-out",
+              }}
+            >
+              ✓ {t("language")} alterado
+            </div>
+          )}
+
           {/* Seção de idioma */}
           <div
             style={{
@@ -151,19 +178,13 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <LanguageButton
                 isActive={language === "pt-BR"}
-                onClick={() => {
-                  setLanguage("pt-BR");
-                  setIsOpen(false);
-                }}
+                onClick={() => handleLanguageChange("pt-BR")}
                 label={t("portuguese")}
                 isDark={isDark}
               />
               <LanguageButton
                 isActive={language === "en"}
-                onClick={() => {
-                  setLanguage("en");
-                  setIsOpen(false);
-                }}
+                onClick={() => handleLanguageChange("en")}
                 label={t("english")}
                 isDark={isDark}
               />
@@ -216,6 +237,12 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        @keyframes fadeInOut {
+          0% { opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { opacity: 0; }
         }
       `}</style>
     </div>

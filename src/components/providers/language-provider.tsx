@@ -18,6 +18,7 @@ const DEFAULT_LANGUAGE: Language = "pt-BR";
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
   const [mounted, setMounted] = useState(false);
+  const [renderKey, setRenderKey] = useState(0);
 
   useEffect(() => {
     // Carrega idioma do localStorage na montagem
@@ -33,6 +34,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const newLanguage = e.newValue as Language;
         setLanguageState(newLanguage);
         document.documentElement.lang = newLanguage === "en" ? "en" : "pt-BR";
+        setRenderKey(prev => prev + 1);
       }
     };
 
@@ -44,6 +46,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(lang);
     localStorage.setItem("platform-language", lang);
     document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
+    setRenderKey(prev => prev + 1);
   };
 
   const t = (key: TranslationKey, params?: Record<string, string | number>): string => {
@@ -51,7 +54,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }} key={renderKey}>
       {children}
     </LanguageContext.Provider>
   );

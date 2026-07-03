@@ -81,7 +81,6 @@ export const translations = {
     "viewAthleteList": "Ver lista de atletas",
     "nameHeading": "Nome",
     "dayCompletedTitle": "Dia {day} concluído!",
-    "congratulations": "Parabéns, {name}!",
     "markAttendance": "Marcar presença",
     "watchVideoThenEnterCode": "Assista ao vídeo acima e depois insira seu código para confirmar a presença.",
     "enterCodeToConfirm": "Insira seu código de atleta para confirmar que assistiu ao conteúdo de hoje.",
@@ -125,6 +124,11 @@ export const translations = {
     // Common
     "close": "Fechar",
     "settings": "Configurações",
+
+    // Login page left panel
+    "listItem1": "Ambiente ideal para dormir",
+    "listItem2": "Controle de telas e melatonina",
+    "listItem3": "Ritmo circadiano e performance",
   },
   "en": {
     // Header
@@ -251,6 +255,11 @@ export const translations = {
     // Common
     "close": "Close",
     "settings": "Settings",
+
+    // Login page left panel
+    "listItem1": "Ideal environment for sleep",
+    "listItem2": "Screen time and melatonin control",
+    "listItem3": "Circadian rhythm and performance",
   },
 } as const;
 

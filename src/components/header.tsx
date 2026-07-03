@@ -34,7 +34,16 @@ export function Header({
       }}
     >
       {/* Logo e título */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <Link
+        href="/"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          textDecoration: "none",
+        }}
+        aria-label="Ir para a página inicial"
+      >
         <div
           style={{
             width: 30,
@@ -59,7 +68,7 @@ export function Header({
         >
           {title}
         </span>
-      </div>
+      </Link>
 
       {/* Conteúdo direito + Menu acessibilidade */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
