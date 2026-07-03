@@ -6,17 +6,25 @@ import { useSession } from "next-auth/react";
 import { daysContent } from "@/content/days";
 import { VideoPlayer } from "@/components/video-player";
 import { CompleteButton } from "@/components/complete-button";
+import { useLanguage } from "@/components/providers/language-provider";
 import Link from "next/link";
 
 export default function DayPage() {
   const { data: session, status } = useSession();
   const params = useParams();
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [videoWatched, setVideoWatched] = useState(false);
+  const [, setRenderTrigger] = useState(0);
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
-  }, [status]);
+  }, [status, router]);
+
+  // Re-renderizar quando o idioma muda
+  useEffect(() => {
+    setRenderTrigger(prev => prev + 1);
+  }, [language]);
 
   if (status === "loading") {
     return (
@@ -35,7 +43,7 @@ export default function DayPage() {
   if (!content) return <main style={{ padding: 48 }}>Conteúdo não encontrado.</main>;
 
   return (
-    <main style={{ minHeight: "100vh", background: "var(--off-white)" }}>
+    <main key={`day-${language}`} style={{ minHeight: "100vh", background: "var(--off-white)" }}>
 
       {/* Nav */}
       <header style={{
@@ -45,11 +53,11 @@ export default function DayPage() {
       }}>
         <Link href="/atleta" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <span style={{ color: "rgba(248,249,252,0.5)", fontSize: 18 }}>←</span>
-          <span style={{ color: "rgba(248,249,252,0.6)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" }}>Voltar à jornada</span>
+          <span style={{ color: "rgba(248,249,252,0.6)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" }}>{t("viewBackJourney")}</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: 6, background: "linear-gradient(135deg,#2B6CB0,#4A90D9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🌙</div>
-          <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>Plataforma do Sono</span>
+          <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>{t("platformName")}</span>
         </div>
       </header>
 
@@ -62,7 +70,7 @@ export default function DayPage() {
             fontSize: 11, fontWeight: 600, padding: "5px 12px", borderRadius: 100,
             fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.08em", textTransform: "uppercase",
           }}>
-            Dia {content.day} de 7
+            {t("dayBadge", { day: content.day })}
           </span>
           <h1 style={{
             fontFamily: "'DM Serif Display',serif", fontSize: 42, color: "var(--navy)",
@@ -81,7 +89,7 @@ export default function DayPage() {
         {/* Infographic */}
         <section style={{ marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 24, color: "var(--navy)", margin: "0 0 20px", fontWeight: 400 }}>
-            Recomendações
+            {t("recommendationsTitle")}
           </h2>
           <div style={{ display: "grid", gap: 12 }}>
             {content.infographic.map((item, i) => {
@@ -106,7 +114,7 @@ export default function DayPage() {
         {/* Video */}
         <section style={{ marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 24, color: "var(--navy)", margin: "0 0 20px", fontWeight: 400 }}>
-            Vídeo educativo
+            {t("educationalVideo")}
           </h2>
           <div style={{ background: "#fff", borderRadius: 12, padding: 4, border: "1px solid var(--border)" }}>
             <VideoPlayer url={content.videoUrl} onWatched={() => setVideoWatched(true)} />
@@ -121,7 +129,7 @@ export default function DayPage() {
         }}>
           <div style={{ fontSize: 40 }}>{content.medal.split(" ")[0]}</div>
           <div>
-            <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 11, fontFamily: "'DM Sans',sans-serif", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Medalha do dia</p>
+            <p style={{ color: "rgba(248,249,252,0.5)", fontSize: 11, fontFamily: "'DM Sans',sans-serif", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{t("dayMedal")}</p>
             <p style={{ color: "#F8F9FC", fontSize: 18, fontFamily: "'DM Serif Display',serif", margin: 0 }}>
               {content.medal.slice(content.medal.indexOf(" ") + 1)}
             </p>

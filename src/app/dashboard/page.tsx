@@ -43,7 +43,7 @@ export default function DashboardPage() {
       return;
     }
     fetchAthletes();
-  }, [status, session]);
+  }, [status, session, router]);
 
   async function fetchAthletes() {
     setLoading(true);

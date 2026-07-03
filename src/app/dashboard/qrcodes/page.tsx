@@ -20,7 +20,7 @@ export default function QRCodesPage() {
       return;
     }
     setBaseUrl(window.location.origin);
-  }, [status, session]);
+  }, [status, session, router]);
 
   function qrUrl(dayUrl: string) {
     return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(dayUrl)}&margin=10`;

@@ -3,16 +3,24 @@
 import Link from "next/link";
 import { daysContent } from "@/content/days";
 import { isDayUnlocked } from "@/lib/progress";
+import { useLanguage } from "@/components/providers/language-provider";
+import { useState, useEffect } from "react";
 
 interface DayCardsProps {
   completedDays: number[];
 }
 
 export function DayCards({ completedDays }: DayCardsProps) {
+  const { t, language } = useLanguage();
+  const [, setRenderTrigger] = useState(0);
   const days = [1, 2, 3, 4, 5, 6, 7];
 
+  useEffect(() => {
+    setRenderTrigger(prev => prev + 1);
+  }, [language]);
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+    <div key={`day-cards-${language}`} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
       {days.map((day) => {
         const unlocked = isDayUnlocked(day, completedDays);
         const completed = completedDays.includes(day);
@@ -45,7 +53,7 @@ export function DayCards({ completedDays }: DayCardsProps) {
           >
             {completed && (
               <div style={{ position: "absolute", top: 0, right: 0, background: "#2B6CB0", color: "#fff", fontSize: 10, fontFamily: "'DM Sans',sans-serif", fontWeight: 600, padding: "4px 12px", borderBottomLeftRadius: 8, letterSpacing: "0.06em" }}>
-                CONCLUÍDO
+                {t("dayCardsCompleted")}
               </div>
             )}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -64,7 +72,7 @@ export function DayCards({ completedDays }: DayCardsProps) {
               margin: "0 0 8px", fontWeight: 400, lineHeight: 1.3,
             }}>{content?.title}</h3>
             <p style={{ color: "var(--muted)", fontSize: 13, fontFamily: "'DM Sans',sans-serif", margin: 0, lineHeight: 1.5 }}>
-              {completed ? "Conteúdo concluído com sucesso." : unlocked ? "Conteúdo disponível — clique para acessar." : "Complete o dia anterior para desbloquear."}
+              {completed ? t("dayCardsContentsCompleted") : unlocked ? t("dayCardsAvailable") : t("dayCardsLocked")}
             </p>
           </Link>
         );
