@@ -4,8 +4,8 @@ import { AuthProvider } from "@/components/providers/session-provider";
 import { LanguageProvider } from "@/components/providers/language-provider";
 
 export const metadata: Metadata = {
-  title: "Plataforma do Sono — Desempenho Esportivo",
-  description: "Programa de higiene do sono para atletas de alto rendimento",
+  title: "Sleep Platform — Sports Performance",
+  description: "Sleep hygiene program for high-performance athletes",
   other: {
     "Content-Security-Policy": "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   },

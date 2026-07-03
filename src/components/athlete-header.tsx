@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
 import { useLanguage } from "@/components/providers/language-provider";
 
@@ -10,6 +10,8 @@ interface AthleteHeaderProps {
 
 export function AthleteHeader({ userName }: AthleteHeaderProps) {
   const { t } = useLanguage();
+  const handleSignOut = () => signOut({ callbackUrl: "/" });
+
   return (
     <header style={{
       background: "var(--navy)", borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -22,14 +24,14 @@ export function AthleteHeader({ userName }: AthleteHeaderProps) {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <span style={{ color: "rgba(248,249,252,0.5)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" }}>
-          {userName}
+          {userName || t("athleteDefaultName")}
         </span>
         <AccessibilityMenu variant="dark" />
-        <Link href="/api/auth/signout" style={{
+        <button type="button" onClick={handleSignOut} style={{
           background: "rgba(255,255,255,0.08)", color: "rgba(248,249,252,0.7)",
           padding: "6px 14px", borderRadius: 6, fontSize: 12,
-          fontFamily: "'DM Sans',sans-serif", textDecoration: "none",
-        }}>{t("signOut")}</Link>
+          fontFamily: "'DM Sans',sans-serif", border: "none", cursor: "pointer",
+        }}>{t("signOut")}</button>
       </div>
     </header>
   );

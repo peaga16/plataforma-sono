@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Header } from "@/components/header";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
 import { useLanguage } from "@/components/providers/language-provider";
@@ -86,12 +85,12 @@ export default function DashboardPage() {
       fetchAthletes();
       setTab("athletes");
     } else {
-      alert(data.error || "Erro ao cadastrar.");
+      alert(data.error || t("registerError"));
     }
   }
 
   async function handleDeleteUser(userId: string, userName: string) {
-    const confirmDelete = confirm(`Excluir o atleta "${userName}"?`);
+    const confirmDelete = confirm(`${t("deleteConfirm")}");
     if (!confirmDelete) return;
 
     try {
@@ -99,14 +98,18 @@ export default function DashboardPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Erro ao excluir usuário.");
+        alert(data.error || t("deleteUserError"));
         return;
       }
 
       setAthletes((prev) => prev.filter((u) => u.id !== userId));
     } catch {
-      alert("Erro ao excluir usuário.");
+      alert(t("deleteUserError"));
     }
+  }
+
+  function handleSignOut() {
+    signOut({ callbackUrl: "/" });
   }
 
   function getCurrentCycle(progresses: Progress[]): number {
@@ -476,9 +479,9 @@ export default function DashboardPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <AccessibilityMenu variant="dark" />
             
-            <Link href="/api/auth/signout" className="dash-signout">
+            <button className="dash-signout" type="button" onClick={handleSignOut}>
               {t("signOut")}
-            </Link>
+            </button>
 
             {/* Mobile menu toggle */}
             <button
@@ -513,13 +516,14 @@ export default function DashboardPage() {
           >
             {t("qrcodesLabel")}
           </a>
-          <Link
-            href="/api/auth/signout"
+          <button
+            type="button"
             className="mobile-nav-btn"
-            style={{ color: "#F87171" }}
+            style={{ color: "#F87171", background: "none", border: "none", cursor: "pointer" }}
+            onClick={handleSignOut}
           >
             {t("signOut")}
-          </Link>
+          </button>
         </div>
 
         {/* Main content */}
@@ -580,7 +584,7 @@ export default function DashboardPage() {
                     fontWeight: 400,
                   }}
                 >
-                  Atletas ({totalAthletes})
+                  {t("athletesCount", { count: totalAthletes.toString() })}
                 </h2>
 
                 <button
@@ -598,7 +602,7 @@ export default function DashboardPage() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  + Cadastrar atletas
+                  {t("registerAthletesCTA")}
                 </button>
               </div>
 
@@ -606,9 +610,9 @@ export default function DashboardPage() {
                 <table className="dash-table">
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--off-white)" }}>
-                      {["Atleta", "Código", "Ciclo atual", "Progresso atual", "Histórico", ""].map((h) => (
+                      {[t("athleteHeading"), t("codeHeading"), t("currentCycleHeading"), t("currentProgressHeading"), t("historyHeading"), ""].map((h) => (
                         <th
-                          key={h}
+                          key={String(h)}
                           style={{
                             padding: "12px 20px",
                             textAlign: "left",
@@ -639,7 +643,7 @@ export default function DashboardPage() {
                             fontSize: 14,
                           }}
                         >
-                          Nenhum atleta cadastrado ainda.{" "}
+                          {t("noAthletesYet")} {" "}
                           <button
                             onClick={() => setTab("register")}
                             style={{
@@ -652,7 +656,7 @@ export default function DashboardPage() {
                               textDecoration: "underline",
                             }}
                           >
-                            Cadastrar agora
+                            {t("registerNow")}
                           </button>
                         </td>
                       </tr>
@@ -722,7 +726,7 @@ export default function DashboardPage() {
                                   fontFamily: "'DM Sans',sans-serif",
                                 }}
                               >
-                                Ciclo {currentCycle}
+                                {t("cycleLabel")} {currentCycle}
                               </span>
                             </td>
 
@@ -777,10 +781,10 @@ export default function DashboardPage() {
                             <td style={{ padding: "16px 20px" }}>
                               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                 <span style={{ fontSize: 13, fontFamily: "'DM Sans',sans-serif", color: "var(--navy)", fontWeight: 500 }}>
-                                  {completedCycles} ciclo{completedCycles !== 1 ? "s" : ""} completo{completedCycles !== 1 ? "s" : ""}
+                                  {completedCycles === 1 ? t("cycleCompletedSingle") : t("cycleCompletedMultiple", { count: completedCycles.toString() })}
                                 </span>
                                 <span style={{ fontSize: 11, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>
-                                  {totalCycles} iniciado{totalCycles !== 1 ? "s" : ""}
+                                  {totalCycles === 1 ? t("cycleStartedSingle") : t("cycleStartedMultiple", { count: totalCycles.toString() })}
                                 </span>
                               </div>
                             </td>
@@ -801,7 +805,7 @@ export default function DashboardPage() {
                                       whiteSpace: "nowrap",
                                     }}
                                   >
-                                    {isExpanded ? "Fechar" : "Ver histórico"}
+                                    {isExpanded ? t("close") : t("viewHistory")}
                                   </button>
                                 )}
 
@@ -818,7 +822,7 @@ export default function DashboardPage() {
                                     whiteSpace: "nowrap",
                                   }}
                                 >
-                                  Excluir
+                                  {t("deleteButton")}
                                 </button>
                               </div>
                             </td>
@@ -828,7 +832,7 @@ export default function DashboardPage() {
                             <tr style={{ background: "#F8FAFF" }}>
                               <td colSpan={6} style={{ padding: "12px 20px 20px" }}>
                                 <p style={{ fontSize: 12, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", marginBottom: 10, marginTop: 0 }}>
-                                  Histórico de ciclos
+                                  {t("cyclesHistoryHeading")}
                                 </p>
                                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                                   {Object.entries(groupByCycle(user.progresses)).map(([cycle, days]) => (
@@ -842,10 +846,10 @@ export default function DashboardPage() {
                                       }}
                                     >
                                       <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 600, color: days.length >= 7 ? "#16A34A" : "#2B6CB0", fontFamily: "'DM Sans',sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                                        Ciclo {cycle} {days.length >= 7 ? "✓" : ""}
+                                        {t("cycleLabel")} {cycle} {days.length >= 7 ? "✓" : ""}
                                       </p>
                                       <p style={{ margin: 0, fontSize: 12, color: "var(--navy)", fontFamily: "'DM Sans',sans-serif" }}>
-                                        {days.sort((a, b) => a - b).map((d) => `Dia ${d}`).join(", ")}
+                                        {days.sort((a, b) => a - b).map((d) => t("dayLabel", { day: d.toString() })).join(", ")}
                                       </p>
                                     </div>
                                   ))}
@@ -874,28 +878,28 @@ export default function DashboardPage() {
                   fontWeight: 400,
                 }}
               >
-                Cadastrar atletas
+                {t("registerAthletesTitle")}
               </h2>
               <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", fontSize: 14, margin: "0 0 28px" }}>
-                Insira um nome por linha. Um código único será gerado para cada atleta.
+                {t("registerAthletesDescription")}
               </p>
 
               <label style={{ display: "block", marginBottom: 8 }}>
                 <span style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                  Nomes dos atletas
+                  {t("athleteNamesLabel")}
                 </span>
               </label>
 
               <textarea
                 className="dash-textarea"
-                placeholder={"João Silva\nMaria Santos\nCarlos Oliveira"}
+                placeholder={t("bulkNamesPlaceholder")}
                 value={bulkNames}
                 onChange={(e) => setBulkNames(e.target.value)}
               />
 
               <div style={{ marginTop: 8, marginBottom: 20 }}>
                 <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>
-                  {bulkNames.split("\n").filter((n) => n.trim()).length} atleta(s) para cadastrar
+                  {t("athletesToRegister", { count: bulkNames.split("\n").filter((n) => n.trim()).length.toString() })}
                 </span>
               </div>
 
@@ -904,7 +908,7 @@ export default function DashboardPage() {
                 onClick={handleBulkRegister}
                 disabled={bulkLoading || !bulkNames.trim()}
               >
-                {bulkLoading ? "Cadastrando..." : "Cadastrar atletas"}
+                {bulkLoading ? t("registeringAthletes") : t("registerAthletesButton")}
               </button>
 
               {bulkResult && (
@@ -912,7 +916,7 @@ export default function DashboardPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <span style={{ fontSize: 18 }}>✅</span>
                     <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 600, color: "#16A34A", margin: 0 }}>
-                      {bulkResult.length} atleta(s) cadastrado(s) com sucesso!
+                      {t("bulkResultSuccess", { count: bulkResult.length.toString() })}
                     </p>
                   </div>
 
@@ -920,8 +924,8 @@ export default function DashboardPage() {
                     <table className="dash-result-table">
                       <thead>
                         <tr>
-                          <th>Nome</th>
-                          <th>Código</th>
+                          <th>{t("nameHeading")}</th>
+                          <th>{t("codeHeading")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -964,7 +968,7 @@ export default function DashboardPage() {
                       width: "100%",
                     }}
                   >
-                    Ver lista de atletas
+                    {t("viewAthleteListButton")}
                   </button>
                 </div>
               )}

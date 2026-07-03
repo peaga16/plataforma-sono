@@ -150,7 +150,7 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
                 animation: "fadeInOut 1.5s ease-in-out",
               }}
             >
-              ✓ {t("language")} alterado
+              {t("languageChanged")}
             </div>
           )}
 
@@ -211,7 +211,7 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              Visual
+              {t("visualAccessibility")}
             </p>
             <p
               style={{
@@ -221,7 +221,7 @@ export function AccessibilityMenu({ variant = "dark" }: AccessibilityMenuProps) 
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              Opções adicionais em breve
+              {t("visualOptionsComingSoon")}
             </p>
           </div>
         </div>

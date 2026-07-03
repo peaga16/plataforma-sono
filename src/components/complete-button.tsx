@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface Props {
   userId: string;
@@ -11,6 +12,7 @@ interface Props {
 
 export function CompleteButton({ userId, day, videoWatched }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
   const [loading, setLoading] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -33,8 +35,12 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
       body: JSON.stringify({ userId, day }),
     });
     setLoading(false);
-    if (response.ok) { alert("Dia concluído com sucesso! 🎉"); router.push("/atleta"); }
-    else alert("Erro ao registrar progresso. Tente novamente.");
+    if (response.ok) {
+      alert(t("dayCompletedSuccess"));
+      router.push("/atleta");
+    } else {
+      alert(t("dayCompleteError"));
+    }
   }
 
   return (
@@ -43,8 +49,8 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
       {/* Status pills */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         {[
-          { done: videoWatched, label: "Vídeo assistido" },
-          { done: scrolledToEnd, label: "Conteúdo lido" },
+          { done: videoWatched, label: t("videoWatchedStatus") },
+          { done: scrolledToEnd, label: t("contentReadStatus") },
         ].map((req) => (
           <div key={req.label} style={{
             display: "flex", alignItems: "center", gap: 8,
@@ -64,9 +70,9 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
       {!canComplete && (
         <p style={{ color: "var(--muted)", fontSize: 13, fontFamily: "'DM Sans',sans-serif", marginBottom: 16, lineHeight: 1.6 }}>
           {!videoWatched && !scrolledToEnd
-            ? "Assista ao vídeo completo e role até o fim da página para liberar a conclusão."
-            : !videoWatched ? "Assista ao vídeo completo para liberar."
-            : "Role até o fim da página para liberar."}
+            ? t("watchFullVideoAndScroll")
+            : !videoWatched ? t("watchVideoToUnlock")
+            : t("scrollToUnlock")}
         </p>
       )}
 
@@ -83,7 +89,7 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
           boxShadow: canComplete ? "0 4px 16px rgba(43,108,176,0.3)" : "none",
         }}
       >
-        {loading ? "Registrando..." : canComplete ? "Concluir conteúdo do dia →" : "🔒 Complete os requisitos acima"}
+        {loading ? t("registeringDay") : canComplete ? t("completeDayButton") : t("completeRequirementsLocked")}
       </button>
     </div>
   );

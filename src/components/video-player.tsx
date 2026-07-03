@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface Props { url: string; onWatched?: () => void; }
 
 export function VideoPlayer({ url, onWatched }: Props) {
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [watched, setWatched] = useState(false);
   const [pct, setPct] = useState(0);
@@ -120,11 +122,11 @@ export function VideoPlayer({ url, onWatched }: Props) {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
             <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 10, fontFamily: "'DM Sans',sans-serif" }}>
-              {pct}% assistido
+              {t("videoProgressWatched", { pct: pct.toString() })}
             </span>
             {watched && (
               <span style={{ color: "#4ADE80", fontSize: 10, fontFamily: "'DM Sans',sans-serif", fontWeight: 600 }}>
-                ✓ Concluído
+                {t("videoWatchedStatus")}
               </span>
             )}
           </div>
@@ -147,7 +149,7 @@ export function VideoPlayer({ url, onWatched }: Props) {
 
       {!watched && (
         <p style={{ fontSize: 12, color: "var(--muted)", fontFamily: "'DM Sans',sans-serif", marginTop: 6 }}>
-          Assista pelo menos 90% do vídeo para liberar a conclusão do dia.
+          {t("watch90Message")}
         </p>
       )}
     </div>

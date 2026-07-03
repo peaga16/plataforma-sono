@@ -70,7 +70,7 @@ export default function QRCodesPage() {
             <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 6, background: "linear-gradient(135deg,#2B6CB0,#4A90D9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🌙</div>
-              <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>Plataforma do Sono</span>
+              <span style={{ color: "#F8F9FC", fontFamily: "'DM Sans',sans-serif", fontWeight: 500, fontSize: 14 }}>{t("platformName")}</span>
             </div>
           </div>
           <button
@@ -163,7 +163,7 @@ export default function QRCodesPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={qrUrl(dayUrl)}
-                    alt={`QR Code Dia ${day.day}`}
+                    alt={`QR Code ${t("dayBadge", { day: day.day.toString() })}`}
                     style={{ width: 240, height: 240, display: "block" }}
                   />
                 </div>

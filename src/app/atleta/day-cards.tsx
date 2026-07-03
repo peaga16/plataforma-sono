@@ -62,7 +62,7 @@ export function DayCards({ completedDays }: DayCardsProps) {
                 color: completed ? "#2B6CB0" : "var(--muted)",
                 fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 100,
                 fontFamily: "'DM Sans',sans-serif", letterSpacing: "0.08em", textTransform: "uppercase",
-              }}>Dia {day}</span>
+              }}>{t("dayLabel", { day: day.toString() })}</span>
               <span style={{ fontSize: 20 }}>
                 {completed ? "✅" : unlocked ? "" : "🔒"}
               </span>
