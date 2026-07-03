@@ -90,7 +90,7 @@ export default function DashboardPage() {
   }
 
   async function handleDeleteUser(userId: string, userName: string) {
-    const confirmDelete = confirm(`${t("deleteConfirm")}");
+    const confirmDelete = confirm(t("deleteConfirm"));
     if (!confirmDelete) return;
 
     try {
@@ -141,17 +141,17 @@ export default function DashboardPage() {
 
   const avgProgress = totalAthletes
     ? Math.round(
-        (athleteList.reduce((sum, u) => {
-          const currentCycle = getCurrentCycle(u.progresses);
-          const daysInCurrentCycle = u.progresses.filter(
-            (p) => p.completed && p.cycle === currentCycle
-          ).length;
-          return sum + daysInCurrentCycle;
-        }, 0) /
-          totalAthletes /
-          7) *
-          100
-      )
+      (athleteList.reduce((sum, u) => {
+        const currentCycle = getCurrentCycle(u.progresses);
+        const daysInCurrentCycle = u.progresses.filter(
+          (p) => p.completed && p.cycle === currentCycle
+        ).length;
+        return sum + daysInCurrentCycle;
+      }, 0) /
+        totalAthletes /
+        7) *
+      100
+    )
     : 0;
 
   const navBtnStyle = (active: boolean): React.CSSProperties => ({
@@ -478,7 +478,7 @@ export default function DashboardPage() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <AccessibilityMenu variant="dark" />
-            
+
             <button className="dash-signout" type="button" onClick={handleSignOut}>
               {t("signOut")}
             </button>
