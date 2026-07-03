@@ -211,7 +211,6 @@ export const translations = {
     "viewAthleteList": "View athlete list",
     "nameHeading": "Name",
     "dayCompletedTitle": "Day {day} completed!",
-    "congratulations": "Congratulations, {name}!",
     "markAttendance": "Mark attendance",
     "watchVideoThenEnterCode": "Watch the video above and then enter your code to confirm attendance.",
     "enterCodeToConfirm": "Enter your athlete code to confirm that you watched today's content.",
@@ -271,7 +270,7 @@ export function getTranslation(
   key: TranslationKey,
   params?: Record<string, string | number>
 ): string {
-  let value = translations[language]?.[key] ?? translations["pt-BR"][key] ?? key;
+  let value: string = translations[language]?.[key] ?? translations["pt-BR"][key] ?? key;
   if (params) {
     Object.entries(params).forEach(([param, paramValue]) => {
       value = value.replace(new RegExp(`\\{${param}\\}`, "g"), String(paramValue));
