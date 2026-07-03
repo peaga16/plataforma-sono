@@ -12,7 +12,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Valor padrão para usar quando o contexto não está disponível
+// ✅ IDIOMA PADRÃO: PORTUGUÊS (NÃO MUDE!)
 const DEFAULT_LANGUAGE: Language = "pt-BR";
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
@@ -21,9 +21,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [renderKey, setRenderKey] = useState(0);
 
   useEffect(() => {
-    // Carrega idioma do localStorage na montagem
+    // ✅ Carregar do localStorage APENAS após mounted
+    if (typeof window === "undefined") return;
+    
     const savedLanguage = localStorage.getItem("platform-language") as Language | null;
-    const activeLanguage = savedLanguage ?? DEFAULT_LANGUAGE;
+    
+    // ✅ Se não tiver salvo, usar português
+    const activeLanguage = savedLanguage && (savedLanguage === "pt-BR" || savedLanguage === "en") 
+      ? savedLanguage 
+      : DEFAULT_LANGUAGE;
+    
     setLanguageState(activeLanguage);
     document.documentElement.lang = activeLanguage === "en" ? "en" : "pt-BR";
     setMounted(true);
@@ -63,11 +70,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage(): LanguageContextType {
   const context = useContext(LanguageContext);
 
-  // Se o contexto não existir, retorna um objeto funcional
-  // com fallback que funciona para SSR
   if (context === undefined) {
-    // Nota: Em um contexto de SSR, setLanguage não vai funcionar
-    // mas pelo menos não vai quebrar o código
     return {
       language: DEFAULT_LANGUAGE,
       setLanguage: (lang: Language) => {
