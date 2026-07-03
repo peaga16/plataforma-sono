@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface Progress {
   day: number;
@@ -24,6 +25,8 @@ interface Athlete {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t, language } = useLanguage();
+  const [, setRenderTrigger] = useState(0);
 
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +38,10 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<"athletes" | "register">("athletes");
   const [expandedAthlete, setExpandedAthlete] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setRenderTrigger(prev => prev + 1);
+  }, [language]);
 
   useEffect(() => {
     if (status === "loading") return;
