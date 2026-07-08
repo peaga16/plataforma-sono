@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentCycle } from "@/lib/progress";
+import { getCurrentCycle, assertDayUnlocked } from "@/lib/progress";
 
 export async function POST(req: Request) {
   try {
@@ -16,10 +16,25 @@ export async function POST(req: Request) {
 
     const currentCycle = await getCurrentCycle(userId);
 
+    try {
+      await assertDayUnlocked(userId, day, currentCycle);
+    } catch (err) {
+      const availableAt = (err as { availableAt?: Date | null }).availableAt;
+      return NextResponse.json(
+        {
+          error: "Este dia ainda não foi liberado.",
+          locked: true,
+          availableAt: availableAt ? availableAt.toISOString() : null,
+        },
+        { status: 403 }
+      );
+    }
+
+    const now = new Date();
     const progress = await prisma.progress.upsert({
       where: { userId_day_cycle: { userId, day, cycle: currentCycle } },
-      update: { completed: true },
-      create: { userId, day, cycle: currentCycle, completed: true },
+      update: { completed: true, completedAt: now },
+      create: { userId, day, cycle: currentCycle, completed: true, completedAt: now },
     });
 
     // Se completou o dia 7, o próximo getCurrentCycle vai retornar currentCycle + 1

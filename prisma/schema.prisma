@@ -18,12 +18,13 @@ model User {
 }
 
 model Progress {
-  id        String   @id @default(cuid())
-  userId    String
-  day       Int
-  cycle     Int      @default(1)
-  completed Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  userId      String
+  day         Int
+  cycle       Int       @default(1)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

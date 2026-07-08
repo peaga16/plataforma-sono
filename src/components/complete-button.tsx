@@ -34,9 +34,19 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, day }),
     });
+    const data = await response.json().catch(() => null);
     setLoading(false);
     if (response.ok) {
       alert(t("dayCompletedSuccess"));
+      router.push("/atleta");
+    } else if (response.status === 403 && data?.locked) {
+      alert(
+        data.availableAt
+          ? t("dayLockedMessageWithDate", {
+              date: new Date(data.availableAt).toLocaleString(),
+            })
+          : t("dayLockedMessage")
+      );
       router.push("/atleta");
     } else {
       alert(t("dayCompleteError"));
