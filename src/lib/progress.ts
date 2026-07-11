@@ -1,11 +1,10 @@
 import { prisma } from "@/lib/prisma";
 
 // Regras de liberação:
-// - Um novo dia só libera 24h depois da conclusão do dia anterior (mesma semana/ciclo).
-// - O dia 1 de uma nova semana (ciclo) só libera 7 dias depois da conclusão do dia 7
-//   da semana anterior.
-export const DAY_UNLOCK_HOURS = 24;
-export const WEEK_UNLOCK_DAYS = 7;
+// - Todos os dias do ciclo atual estão liberados imediatamente (sem restrição de 24h entre dias).
+// - O dia 1 de um novo ciclo só libera 7 dias depois da conclusão do dia 7 do ciclo anterior.
+export const DAY_UNLOCK_HOURS = 0; // Não mais usamos 24h entre dias
+export const WEEK_UNLOCK_DAYS = 7; // 7 dias entre ciclos
 
 const DAY_UNLOCK_MS = DAY_UNLOCK_HOURS * 60 * 60 * 1000;
 const WEEK_UNLOCK_MS = WEEK_UNLOCK_DAYS * 24 * 60 * 60 * 1000;
@@ -97,15 +96,9 @@ export function getDayUnlockStatus(
     return { unlocked: availableAt.getTime() <= now.getTime(), availableAt };
   }
 
-  const previousDay = cycleProgress.find((p) => p.day === day - 1);
-
-  // Dia anterior ainda não concluído: bloqueado, sem previsão de data.
-  if (!previousDay?.completed || !previousDay.completedAt) {
-    return { unlocked: false, availableAt: null };
-  }
-
-  const availableAt = new Date(previousDay.completedAt.getTime() + DAY_UNLOCK_MS);
-  return { unlocked: availableAt.getTime() <= now.getTime(), availableAt };
+  // Todos os dias do ciclo atual estão liberados imediatamente
+  // (sem necessidade de completar o dia anterior)
+  return { unlocked: true, availableAt: null };
 }
 
 // Guarda de segurança usada nos endpoints de conclusão (server-side).
