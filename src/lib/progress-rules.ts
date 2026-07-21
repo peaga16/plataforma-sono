@@ -1,14 +1,19 @@
 export const PROGRAM_DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
+export type ProgramDay = (typeof PROGRAM_DAYS)[number];
+
 export interface ProgressSnapshot {
   cycle: number;
   day: number;
   completed: boolean;
 }
 
+export function isProgramDay(day: number): day is ProgramDay {
+  return PROGRAM_DAYS.includes(day as ProgramDay);
+}
+
 export function normalizeCompletedDays(days: number[]) {
-  return [...new Set(days.filter((day) => PROGRAM_DAYS.includes(day as (typeof PROGRAM_DAYS)[number])))]
-    .sort((a, b) => a - b);
+  return [...new Set(days.filter(isProgramDay))].sort((a, b) => a - b);
 }
 
 export function isCycleComplete(completedDays: number[]) {
@@ -33,7 +38,7 @@ export function getCurrentCycleFromProgress(progresses: ProgressSnapshot[]): num
 }
 
 export function isDayUnlocked(day: number, completedDays: number[]) {
-  if (!Number.isInteger(day) || day < 1 || day > PROGRAM_DAYS.length) return false;
+  if (!isProgramDay(day)) return false;
   if (day === 1) return true;
 
   const completed = new Set(normalizeCompletedDays(completedDays));

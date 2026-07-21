@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentCycle } from "@/lib/progress";
+import {
+  assertDayUnlocked,
+  completeDayProgress,
+  getCurrentCycle,
+} from "@/lib/progress";
+import { isProgramDay } from "@/lib/progress-rules";
 
 export async function POST(req: Request) {
   try {
@@ -9,7 +14,7 @@ export async function POST(req: Request) {
     const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
     const day = Number(body.day);
 
-    if (!code || !Number.isInteger(day) || !PROGRAM_DAYS.includes(day as (typeof PROGRAM_DAYS)[number])) {
+    if (!code || !isProgramDay(day)) {
       return NextResponse.json(
         { error: "Código e um dia válido entre 1 e 7 são obrigatórios." },
         { status: 400 }
@@ -29,35 +34,34 @@ export async function POST(req: Request) {
 
     const currentCycle = await getCurrentCycle(user.id);
 
-    // Verifica se o dia anterior foi concluído no ciclo atual
-    if (day > 1) {
-      const prevProgress = await prisma.progress.findUnique({
-        where: { userId_day_cycle: { userId: user.id, day: day - 1, cycle: currentCycle } },
-      });
-      if (!prevProgress?.completed) {
-        return NextResponse.json(
-          { error: `Complete o Dia ${day - 1} antes de acessar este conteúdo.` },
-          { status: 403 }
-        );
+    try {
+      await assertDayUnlocked(user.id, day, currentCycle);
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== "DAY_LOCKED") {
+        throw error;
       }
+
+      const availableAt = (error as Error & { availableAt?: Date | null }).availableAt;
+
+      return NextResponse.json(
+        {
+          error: "Este dia ainda não foi liberado.",
+          locked: true,
+          availableAt: availableAt ? availableAt.toISOString() : null,
+        },
+        { status: 403 }
+      );
     }
 
-    const now = new Date();
-    const progress = await prisma.progress.upsert({
-      where: { userId_day_cycle: { userId: user.id, day, cycle: currentCycle } },
-      update: { completed: true, completedAt: now },
-      create: { userId: user.id, day, cycle: currentCycle, completed: true, completedAt: now },
-    });
+    const progress = await completeDayProgress(user.id, day, currentCycle);
 
     revalidatePath("/atleta");
     revalidatePath("/dashboard");
 
-    const cycleReset = day === 7;
-
     return NextResponse.json({
       ...progress,
       athleteName: user.name,
-      cycleReset,
+      cycleReset: day === 7,
       currentCycle,
     });
   } catch (error) {

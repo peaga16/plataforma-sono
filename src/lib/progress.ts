@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import {
   isCycleComplete,
   isDayUnlocked as isSequenceUnlocked,
+  isProgramDay,
 } from "@/lib/progress-rules";
 
 // Mantém compatibilidade com possíveis imports antigos.
@@ -151,7 +152,7 @@ export function getDayUnlockStatus(
 ): DayUnlockStatus {
   const now = new Date();
 
-  if (!Number.isInteger(day) || day < 1 || day > 7) {
+  if (!isProgramDay(day)) {
     return {
       unlocked: false,
       availableAt: null,
@@ -233,6 +234,34 @@ export function getDayUnlockStatus(
     unlocked: availableAt.getTime() <= now.getTime(),
     availableAt,
   };
+}
+
+/**
+ * Registra a conclusão sem alterar completedAt quando o dia já estava concluído.
+ * Isso evita reiniciar, por engano, o prazo de liberação do dia seguinte.
+ */
+export async function completeDayProgress(
+  userId: string,
+  day: number,
+  cycle: number
+) {
+  const where = {
+    userId_day_cycle: { userId, day, cycle },
+  };
+
+  const existingProgress = await prisma.progress.findUnique({ where });
+
+  if (existingProgress?.completed) {
+    return existingProgress;
+  }
+
+  const completedAt = new Date();
+
+  return prisma.progress.upsert({
+    where,
+    update: { completed: true, completedAt },
+    create: { userId, day, cycle, completed: true, completedAt },
+  });
 }
 
 /**

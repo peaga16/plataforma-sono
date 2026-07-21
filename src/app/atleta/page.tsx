@@ -39,7 +39,7 @@ export default async function AthletePage() {
           currentCycle={currentCycle}
         />
 
-        <DayCards completedDays={completedDays} />
+        <DayCards days={daysStatus} />
       </div>
     </main>
   );

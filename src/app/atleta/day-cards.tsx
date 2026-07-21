@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { daysContent } from "@/content/days";
-import { isDayUnlocked } from "@/lib/progress";
 import { useLanguage } from "@/components/providers/language-provider";
 import { useState, useEffect } from "react";
 
@@ -33,7 +32,7 @@ function formatCountdown(availableAt: string, now: number): string {
 export function DayCards({ days: daysStatus }: DayCardsProps) {
   const { t, language } = useLanguage();
   const [, setRenderTrigger] = useState(0);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
   const days = [1, 2, 3, 4, 5, 6, 7];
 
   useEffect(() => {
@@ -42,6 +41,7 @@ export function DayCards({ days: daysStatus }: DayCardsProps) {
 
   // Atualiza a contagem regressiva a cada minuto.
   useEffect(() => {
+    setNow(Date.now());
     const interval = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(interval);
   }, []);
@@ -50,12 +50,16 @@ export function DayCards({ days: daysStatus }: DayCardsProps) {
     <div key={`day-cards-${language}`} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
       {days.map((day) => {
         const status = daysStatus.find((d) => d.day === day);
-        const unlocked = status?.unlocked ?? false;
         const completed = status?.completed ?? false;
         const availableAt = status?.availableAt ?? null;
+        const unlockedByTime =
+          now !== null &&
+          availableAt !== null &&
+          new Date(availableAt).getTime() <= now;
+        const unlocked = (status?.unlocked ?? false) || unlockedByTime;
         const content = daysContent.find((d) => d.day === day);
 
-        const countdown = !unlocked && availableAt ? formatCountdown(availableAt, now) : "";
+        const countdown = !unlocked && availableAt && now !== null ? formatCountdown(availableAt, now) : "";
 
         let statusText = t("dayCardsLocked");
         if (completed) {
