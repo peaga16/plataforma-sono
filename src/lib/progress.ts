@@ -1,21 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import {
   isCycleComplete,
-  isDayUnlocked as isSequenceUnlocked,
   isProgramDay,
 } from "@/lib/progress-rules";
 
 // Mantém compatibilidade com possíveis imports antigos.
 export { isDayUnlocked } from "@/lib/progress-rules";
 
-// Regras de liberação:
-// - Um novo dia libera 24 horas depois da conclusão do anterior.
-// - O Dia 1 de um novo ciclo libera 7 dias após o Dia 7 do ciclo anterior.
-export const DAY_UNLOCK_HOURS = 24;
-export const WEEK_UNLOCK_DAYS = 7;
-
-const DAY_UNLOCK_MS = DAY_UNLOCK_HOURS * 60 * 60 * 1000;
-const WEEK_UNLOCK_MS = WEEK_UNLOCK_DAYS * 24 * 60 * 60 * 1000;
+// Mantidos por compatibilidade com imports existentes.
+// A regra atual deixa todos os dias disponíveis imediatamente.
+export const DAY_UNLOCK_HOURS = 0;
+export const WEEK_UNLOCK_DAYS = 0;
 
 export type ProgressRecord = {
   day: number;
@@ -143,96 +138,16 @@ export async function getAllCyclesProgress(userId: string) {
 }
 
 /**
- * Calcula se determinado dia está liberado.
+ * Todos os dias válidos do programa ficam liberados imediatamente.
  */
 export function getDayUnlockStatus(
   day: number,
-  cycleProgress: ProgressRecord[],
-  previousCycleDay7: ProgressRecord | null
+  _cycleProgress: ProgressRecord[],
+  _previousCycleDay7: ProgressRecord | null
 ): DayUnlockStatus {
-  const now = new Date();
-
-  if (!isProgramDay(day)) {
-    return {
-      unlocked: false,
-      availableAt: null,
-    };
-  }
-
-  const currentDay = cycleProgress.find(
-    (progress) => progress.day === day
-  );
-
-  // Um conteúdo já concluído deve continuar acessível.
-  if (currentDay?.completed) {
-    return {
-      unlocked: true,
-      availableAt: null,
-    };
-  }
-
-  const completedDays = cycleProgress
-    .filter((progress) => progress.completed)
-    .map((progress) => progress.day);
-
-  /**
-   * Dia 1:
-   * No primeiro ciclo libera imediatamente.
-   * Nos ciclos seguintes, aguarda 7 dias após o Dia 7 anterior.
-   */
-  if (day === 1) {
-    if (
-      !previousCycleDay7?.completed ||
-      !previousCycleDay7.completedAt
-    ) {
-      return {
-        unlocked: true,
-        availableAt: null,
-      };
-    }
-
-    const availableAt = new Date(
-      previousCycleDay7.completedAt.getTime() + WEEK_UNLOCK_MS
-    );
-
-    return {
-      unlocked: availableAt.getTime() <= now.getTime(),
-      availableAt,
-    };
-  }
-
-  /**
-   * Impede que os Dias 2 a 7 sejam liberados com dados incompletos.
-   * Todos os dias anteriores do ciclo atual precisam estar concluídos.
-   */
-  if (!isSequenceUnlocked(day, completedDays)) {
-    return {
-      unlocked: false,
-      availableAt: null,
-    };
-  }
-
-  const previousDay = cycleProgress.find(
-    (progress) => progress.day === day - 1
-  );
-
-  if (
-    !previousDay?.completed ||
-    !previousDay.completedAt
-  ) {
-    return {
-      unlocked: false,
-      availableAt: null,
-    };
-  }
-
-  const availableAt = new Date(
-    previousDay.completedAt.getTime() + DAY_UNLOCK_MS
-  );
-
   return {
-    unlocked: availableAt.getTime() <= now.getTime(),
-    availableAt,
+    unlocked: isProgramDay(day),
+    availableAt: null,
   };
 }
 
@@ -265,46 +180,14 @@ export async function completeDayProgress(
 }
 
 /**
- * Proteção utilizada pelas APIs de conclusão.
- *
- * Impede que alguém conclua um dia bloqueado enviando
- * uma requisição diretamente para a API.
+ * Mantém a validação do número do dia, mas não bloqueia conteúdos válidos.
  */
 export async function assertDayUnlocked(
-  userId: string,
+  _userId: string,
   day: number,
-  cycle: number
+  _cycle: number
 ): Promise<void> {
-  const cycleProgress = await prisma.progress.findMany({
-    where: {
-      userId,
-      cycle,
-    },
-    select: {
-      day: true,
-      completed: true,
-      completedAt: true,
-    },
-  });
-
-  const previousCycleDay7 = await getPreviousCycleDay7(
-    userId,
-    cycle
-  );
-
-  const status = getDayUnlockStatus(
-    day,
-    cycleProgress,
-    previousCycleDay7
-  );
-
-  if (!status.unlocked) {
-    const error = new Error("DAY_LOCKED") as Error & {
-      availableAt?: Date | null;
-    };
-
-    error.availableAt = status.availableAt;
-
-    throw error;
+  if (!isProgramDay(day)) {
+    throw new Error("DAY_LOCKED");
   }
 }

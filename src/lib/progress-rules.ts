@@ -37,12 +37,7 @@ export function getCurrentCycleFromProgress(progresses: ProgressSnapshot[]): num
   return isCycleComplete(completedDays) ? latestCycle + 1 : latestCycle;
 }
 
-export function isDayUnlocked(day: number, completedDays: number[]) {
-  if (!isProgramDay(day)) return false;
-  if (day === 1) return true;
-
-  const completed = new Set(normalizeCompletedDays(completedDays));
-
-  // Exige todos os dias anteriores do ciclo atual, não apenas o imediatamente anterior.
-  return PROGRAM_DAYS.slice(0, day - 1).every((previousDay) => completed.has(previousDay));
+export function isDayUnlocked(day: number, _completedDays: number[]) {
+  // Todos os conteúdos do ciclo ficam disponíveis desde o início.
+  return isProgramDay(day);
 }
