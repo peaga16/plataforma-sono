@@ -1,4 +1,4 @@
-import { getUserProgress } from "@/lib/progress";
+import { getUserProgress, getDayUnlockStatus } from "@/lib/progress";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DayCards } from "./day-cards";
@@ -13,10 +13,20 @@ export default async function AthletePage() {
   if (!session?.user) redirect("/login");
 
   const userId = session.user.id;
-  const { progress, currentCycle } = await getUserProgress(userId);
+  const { progress, currentCycle, previousCycleDay7 } = await getUserProgress(userId);
   const completedDays = progress.filter((p) => p.completed).map((p) => p.day);
   const totalCompleted = completedDays.length;
   const userName = session.user.name || session.user.email || "Atleta";
+
+  const daysStatus = [1, 2, 3, 4, 5, 6, 7].map((day) => {
+    const status = getDayUnlockStatus(day, progress, previousCycleDay7);
+    return {
+      day,
+      completed: completedDays.includes(day),
+      unlocked: status.unlocked,
+      availableAt: status.availableAt ? status.availableAt.toISOString() : null,
+    };
+  });
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--off-white)" }}>
@@ -29,7 +39,7 @@ export default async function AthletePage() {
           currentCycle={currentCycle}
         />
 
-        <DayCards key={currentCycle} completedDays={completedDays} />
+        <DayCards completedDays={completedDays} />
       </div>
     </main>
   );

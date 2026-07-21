@@ -2,29 +2,69 @@
 
 import Link from "next/link";
 import { daysContent } from "@/content/days";
-import { isDayUnlocked } from "@/lib/progress-rules";
+import { isDayUnlocked } from "@/lib/progress";
 import { useLanguage } from "@/components/providers/language-provider";
 import { useState, useEffect } from "react";
 
-interface DayCardsProps {
-  completedDays: number[];
+interface DayStatus {
+  day: number;
+  completed: boolean;
+  unlocked: boolean;
+  availableAt: string | null; // ISO string
 }
 
-export function DayCards({ completedDays }: DayCardsProps) {
+interface DayCardsProps {
+  days: DayStatus[];
+}
+
+function formatCountdown(availableAt: string, now: number): string {
+  const diffMs = new Date(availableAt).getTime() - now;
+  if (diffMs <= 0) return "";
+  const totalMinutes = Math.ceil(diffMs / 60000);
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}min`;
+  return `${minutes}min`;
+}
+
+export function DayCards({ days: daysStatus }: DayCardsProps) {
   const { t, language } = useLanguage();
   const [, setRenderTrigger] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   const days = [1, 2, 3, 4, 5, 6, 7];
 
   useEffect(() => {
-    setRenderTrigger(prev => prev + 1);
+    setRenderTrigger((prev) => prev + 1);
   }, [language]);
+
+  // Atualiza a contagem regressiva a cada minuto.
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div key={`day-cards-${language}`} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
       {days.map((day) => {
-        const unlocked = isDayUnlocked(day, completedDays);
-        const completed = completedDays.includes(day);
+        const status = daysStatus.find((d) => d.day === day);
+        const unlocked = status?.unlocked ?? false;
+        const completed = status?.completed ?? false;
+        const availableAt = status?.availableAt ?? null;
         const content = daysContent.find((d) => d.day === day);
+
+        const countdown = !unlocked && availableAt ? formatCountdown(availableAt, now) : "";
+
+        let statusText = t("dayCardsLocked");
+        if (completed) {
+          statusText = t("dayCardsContentsCompleted");
+        } else if (unlocked) {
+          statusText = t("dayCardsAvailable");
+        } else if (countdown) {
+          statusText = t("dayCardsLockedUntil", { time: countdown });
+        }
 
         return (
           <Link
@@ -72,7 +112,7 @@ export function DayCards({ completedDays }: DayCardsProps) {
               margin: "0 0 8px", fontWeight: 400, lineHeight: 1.3,
             }}>{content?.title}</h3>
             <p style={{ color: "var(--muted)", fontSize: 13, fontFamily: "'DM Sans',sans-serif", margin: 0, lineHeight: 1.5 }}>
-              {completed ? t("dayCardsContentsCompleted") : unlocked ? t("dayCardsAvailable") : t("dayCardsLocked")}
+              {statusText}
             </p>
           </Link>
         );

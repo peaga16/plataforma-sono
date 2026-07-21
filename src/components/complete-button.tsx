@@ -34,11 +34,11 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, day }),
     });
+    const data = await response.json().catch(() => null);
     setLoading(false);
     if (response.ok) {
       alert(t("dayCompletedSuccess"));
-      router.replace("/atleta");
-      router.refresh();
+      router.push("/atleta");
     } else {
       alert(t("dayCompleteError"));
     }
@@ -73,7 +73,7 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
           {!videoWatched && !scrolledToEnd
             ? t("watchFullVideoAndScroll")
             : !videoWatched ? t("watchVideoToUnlock")
-            : t("scrollToUnlock")}
+              : t("scrollToUnlock")}
         </p>
       )}
 

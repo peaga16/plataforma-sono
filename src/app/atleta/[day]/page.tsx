@@ -16,6 +16,8 @@ export default function DayPage() {
   const { t, language } = useLanguage();
   const [videoWatched, setVideoWatched] = useState(false);
   const [, setRenderTrigger] = useState(0);
+  const [lockCheck, setLockCheck] = useState<"checking" | "locked" | "unlocked">("checking");
+  const [availableAt, setAvailableAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
@@ -26,7 +28,34 @@ export default function DayPage() {
     setRenderTrigger(prev => prev + 1);
   }, [language]);
 
-  if (status === "loading") {
+  const dayParam = params.day as string;
+  const dayNumberForCheck = Number(dayParam.replace("dia-", ""));
+
+  // Confere no servidor se o dia realmente está liberado (evita acesso direto pela URL).
+  useEffect(() => {
+    if (status !== "authenticated" || !dayNumberForCheck) return;
+    let cancelled = false;
+    setLockCheck("checking");
+    fetch(`/api/day-status?day=${dayNumberForCheck}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (data.unlocked) {
+          setLockCheck("unlocked");
+        } else {
+          setAvailableAt(data.availableAt ?? null);
+          setLockCheck("locked");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLockCheck("locked");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [status, dayNumberForCheck]);
+
+  if (status === "loading" || (status === "authenticated" && lockCheck === "checking")) {
     return (
       <main style={{ minHeight: "100vh", background: "var(--off-white)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <p style={{ color: "var(--muted)", fontFamily: "'DM Sans',sans-serif" }}>{t("loading")}</p>
@@ -36,11 +65,36 @@ export default function DayPage() {
 
   if (!session?.user) return null;
 
-  const day = params.day as string;
-  const dayNumber = Number(day.replace("dia-", ""));
+  const dayNumber = dayNumberForCheck;
   const content = daysContent.find((item) => item.day === dayNumber);
 
   if (!content) return <main style={{ padding: 48 }}>{t("contentNotFound")}</main>;
+
+  if (lockCheck === "locked") {
+    return (
+      <main style={{ minHeight: "100vh", background: "var(--off-white)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 12, padding: "40px 36px", maxWidth: 420, textAlign: "center" }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
+          <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 22, color: "var(--navy)", margin: "0 0 12px", fontWeight: 400 }}>
+            {t("dayLockedTitle")}
+          </h1>
+          <p style={{ color: "var(--muted)", fontSize: 14, fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6, margin: "0 0 24px" }}>
+            {availableAt
+              ? t("dayLockedMessageWithDate", {
+                  date: new Date(availableAt).toLocaleString(language === "en" ? "en-US" : "pt-BR"),
+                })
+              : t("dayLockedMessage")}
+          </p>
+          <Link href="/atleta" style={{
+            display: "inline-block", background: "var(--navy)", color: "#fff", textDecoration: "none",
+            borderRadius: 8, padding: "12px 24px", fontSize: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 500,
+          }}>
+            {t("viewBackJourney")}
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main key={`day-${language}`} style={{ minHeight: "100vh", background: "var(--off-white)" }}>

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentCycle } from "@/lib/progress";
-import { isDayUnlocked, PROGRAM_DAYS } from "@/lib/progress-rules";
 
 export async function POST(req: Request) {
   try {
@@ -29,23 +28,25 @@ export async function POST(req: Request) {
     }
 
     const currentCycle = await getCurrentCycle(user.id);
-    const completedRecords = await prisma.progress.findMany({
-      where: { userId: user.id, cycle: currentCycle, completed: true },
-      select: { day: true },
-    });
-    const completedDays = completedRecords.map((record) => record.day);
 
-    if (!isDayUnlocked(day, completedDays)) {
-      return NextResponse.json(
-        { error: "Conclua todos os dias anteriores deste ciclo antes de continuar." },
-        { status: 403 }
-      );
+    // Verifica se o dia anterior foi concluído no ciclo atual
+    if (day > 1) {
+      const prevProgress = await prisma.progress.findUnique({
+        where: { userId_day_cycle: { userId: user.id, day: day - 1, cycle: currentCycle } },
+      });
+      if (!prevProgress?.completed) {
+        return NextResponse.json(
+          { error: `Complete o Dia ${day - 1} antes de acessar este conteúdo.` },
+          { status: 403 }
+        );
+      }
     }
 
+    const now = new Date();
     const progress = await prisma.progress.upsert({
       where: { userId_day_cycle: { userId: user.id, day, cycle: currentCycle } },
-      update: { completed: true },
-      create: { userId: user.id, day, cycle: currentCycle, completed: true },
+      update: { completed: true, completedAt: now },
+      create: { userId: user.id, day, cycle: currentCycle, completed: true, completedAt: now },
     });
 
     revalidatePath("/atleta");

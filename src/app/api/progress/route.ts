@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentCycle } from "@/lib/progress";
-import { isDayUnlocked, PROGRAM_DAYS } from "@/lib/progress-rules";
 
 export async function POST(req: Request) {
   try {
@@ -31,10 +30,25 @@ export async function POST(req: Request) {
       );
     }
 
+    try {
+      await assertDayUnlocked(userId, day, currentCycle);
+    } catch (err) {
+      const availableAt = (err as { availableAt?: Date | null }).availableAt;
+      return NextResponse.json(
+        {
+          error: "Este dia ainda não foi liberado.",
+          locked: true,
+          availableAt: availableAt ? availableAt.toISOString() : null,
+        },
+        { status: 403 }
+      );
+    }
+
+    const now = new Date();
     const progress = await prisma.progress.upsert({
       where: { userId_day_cycle: { userId, day, cycle: currentCycle } },
-      update: { completed: true },
-      create: { userId, day, cycle: currentCycle, completed: true },
+      update: { completed: true, completedAt: now },
+      create: { userId, day, cycle: currentCycle, completed: true, completedAt: now },
     });
 
     // Garante que a tela do atleta não reutilize os cards do ciclo anterior.
