@@ -37,7 +37,8 @@ export function CompleteButton({ userId, day, videoWatched }: Props) {
     setLoading(false);
     if (response.ok) {
       alert(t("dayCompletedSuccess"));
-      router.push("/atleta");
+      router.replace("/atleta");
+      router.refresh();
     } else {
       alert(t("dayCompleteError"));
     }

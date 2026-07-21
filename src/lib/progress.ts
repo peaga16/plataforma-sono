@@ -1,47 +1,46 @@
 import { prisma } from "@/lib/prisma";
+import { isCycleComplete } from "@/lib/progress-rules";
 
-// Descobre o ciclo atual:
-// - Se o ciclo mais recente tem os 7 dias completos → novo ciclo (+ 1)
-// - Caso contrário → ciclo mais recente
+// Descobre o ciclo atual.
+// A busca considera qualquer registro do ciclo mais recente, inclusive registros
+// ainda não concluídos. Isso impede que o sistema volte a usar o ciclo anterior
+// quando um novo ciclo já foi criado, mas ainda não possui dias completos.
 export async function getCurrentCycle(userId: string): Promise<number> {
-  const last = await prisma.progress.findFirst({
-    where: { userId, completed: true },
-    orderBy: { cycle: "desc" },
+  const latestProgress = await prisma.progress.findFirst({
+    where: { userId },
+    orderBy: [{ cycle: "desc" }, { day: "desc" }],
+    select: { cycle: true },
   });
 
-  if (!last) return 1; // nunca fez nada ainda
+  if (!latestProgress) return 1;
 
-  const lastCycle = last.cycle;
-
-  // Conta quantos dias completos existem no ciclo mais recente
-  const completedInCycle = await prisma.progress.count({
-    where: { userId, cycle: lastCycle, completed: true },
+  const latestCycle = latestProgress.cycle;
+  const completedRecords = await prisma.progress.findMany({
+    where: { userId, cycle: latestCycle, completed: true },
+    select: { day: true },
   });
 
-  // Se completou todos os 7 dias, próximo ciclo
-  if (completedInCycle >= 7) return lastCycle + 1;
+  const completedDays = completedRecords.map((record) => record.day);
 
-  return lastCycle;
+  // Só avança quando os sete dias válidos do ciclo foram realmente concluídos.
+  return isCycleComplete(completedDays) ? latestCycle + 1 : latestCycle;
 }
 
-// Retorna progresso do ciclo atual
+// Retorna exclusivamente o progresso do ciclo atual.
 export async function getUserProgress(userId: string) {
   const currentCycle = await getCurrentCycle(userId);
   const progress = await prisma.progress.findMany({
     where: { userId, cycle: currentCycle },
+    orderBy: { day: "asc" },
   });
+
   return { progress, currentCycle };
 }
 
-// Retorna todo o histórico para o dashboard
+// Retorna todo o histórico para o dashboard.
 export async function getAllCyclesProgress(userId: string) {
   return prisma.progress.findMany({
     where: { userId, completed: true },
     orderBy: [{ cycle: "asc" }, { day: "asc" }],
   });
-}
-
-export function isDayUnlocked(day: number, completedDays: number[]) {
-  if (day === 1) return true;
-  return completedDays.includes(day - 1);
 }

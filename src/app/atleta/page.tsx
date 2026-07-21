@@ -5,6 +5,9 @@ import { DayCards } from "./day-cards";
 import { AthleteHeader } from "@/components/athlete-header";
 import { AthleteProgressSummary } from "@/components/athlete-progress-summary";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AthletePage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -26,7 +29,7 @@ export default async function AthletePage() {
           currentCycle={currentCycle}
         />
 
-        <DayCards completedDays={completedDays} />
+        <DayCards key={currentCycle} completedDays={completedDays} />
       </div>
     </main>
   );

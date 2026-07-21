@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { AccessibilityMenu } from "@/components/accessibility-menu";
 import { useLanguage } from "@/components/providers/language-provider";
+import { getCurrentCycleFromProgress, isCycleComplete } from "@/lib/progress-rules";
 
 interface Progress {
   day: number;
@@ -112,14 +113,6 @@ export default function DashboardPage() {
     signOut({ callbackUrl: "/" });
   }
 
-  function getCurrentCycle(progresses: Progress[]): number {
-    const completed = progresses.filter((p) => p.completed);
-    if (!completed.length) return 1;
-    const maxCycle = Math.max(...completed.map((p) => p.cycle));
-    const daysInMaxCycle = completed.filter((p) => p.cycle === maxCycle).length;
-    return daysInMaxCycle >= 7 ? maxCycle + 1 : maxCycle;
-  }
-
   function groupByCycle(progresses: Progress[]) {
     const cycles: Record<number, number[]> = {};
     progresses
@@ -136,13 +129,13 @@ export default function DashboardPage() {
 
   const totalCompleted = athleteList.filter((u) => {
     const cycles = groupByCycle(u.progresses);
-    return Object.values(cycles).some((days) => days.length >= 7);
+    return Object.values(cycles).some((days) => isCycleComplete(days));
   }).length;
 
   const avgProgress = totalAthletes
     ? Math.round(
       (athleteList.reduce((sum, u) => {
-        const currentCycle = getCurrentCycle(u.progresses);
+        const currentCycle = getCurrentCycleFromProgress(u.progresses);
         const daysInCurrentCycle = u.progresses.filter(
           (p) => p.completed && p.cycle === currentCycle
         ).length;
@@ -663,7 +656,7 @@ export default function DashboardPage() {
                     )}
 
                     {athleteList.map((user) => {
-                      const currentCycle = getCurrentCycle(user.progresses);
+                      const currentCycle = getCurrentCycleFromProgress(user.progresses);
                       const cycles = groupByCycle(user.progresses);
 
                       const currentCycleDays = user.progresses
@@ -672,7 +665,7 @@ export default function DashboardPage() {
 
                       const pct = Math.round((currentCycleDays.length / 7) * 100);
                       const totalCycles = Object.keys(cycles).length;
-                      const completedCycles = Object.values(cycles).filter((days) => days.length >= 7).length;
+                      const completedCycles = Object.values(cycles).filter((days) => isCycleComplete(days)).length;
                       const isExpanded = expandedAthlete === user.id;
 
                       return (
@@ -839,14 +832,14 @@ export default function DashboardPage() {
                                     <div
                                       key={cycle}
                                       style={{
-                                        background: days.length >= 7 ? "#DCFCE7" : "#EFF6FF",
-                                        border: `1px solid ${days.length >= 7 ? "#16A34A" : "#2B6CB0"}`,
+                                        background: isCycleComplete(days) ? "#DCFCE7" : "#EFF6FF",
+                                        border: `1px solid ${isCycleComplete(days) ? "#16A34A" : "#2B6CB0"}`,
                                         borderRadius: 8,
                                         padding: "8px 14px",
                                       }}
                                     >
-                                      <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 600, color: days.length >= 7 ? "#16A34A" : "#2B6CB0", fontFamily: "'DM Sans',sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                                        {t("cycleLabel")} {cycle} {days.length >= 7 ? "✓" : ""}
+                                      <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 600, color: isCycleComplete(days) ? "#16A34A" : "#2B6CB0", fontFamily: "'DM Sans',sans-serif", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                                        {t("cycleLabel")} {cycle} {isCycleComplete(days) ? "✓" : ""}
                                       </p>
                                       <p style={{ margin: 0, fontSize: 12, color: "var(--navy)", fontFamily: "'DM Sans',sans-serif" }}>
                                         {days.sort((a, b) => a - b).map((d) => t("dayLabel", { day: d.toString() })).join(", ")}

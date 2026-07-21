@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { daysContent } from "@/content/days";
-import { isDayUnlocked } from "@/lib/progress";
+import { isDayUnlocked } from "@/lib/progress-rules";
 import { useLanguage } from "@/components/providers/language-provider";
 import { useState, useEffect } from "react";
 
